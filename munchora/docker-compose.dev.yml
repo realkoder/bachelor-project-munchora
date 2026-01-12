@@ -1,3 +1,17 @@
+# ===========================================================================================================
+#                            🐳 🐳 🐳 🐳 🐳 DOCKER COMPOSE DEV 🐳 🐳 🐳 🐳 🐳
+# ===========================================================================================================
+# docker-compose up:    docker-compose -f docker-compose.dev.yml up
+# docker-compose logs:  docker-compose -f docker-compose.dev.yml logs -f
+# docker-compose down:  docker-compose -f docker-compose.dev.yml down --rmi all --remove-orphans
+#                       // Deletes all images - JUST MAKE SURE VOLUMES WON'T BE DELETED
+#
+# Generate a mysql dump file: docker exec -i <servie-name> mysqldump -u root -padmin <db_name> > ./munchora_dump.sql
+#
+# Interact with running docker based mysql: docker exec -it <containerID / name> mysql -u root -padmin
+#
+# Interact with docker based rails app: docker-compose exec <docker name> bash
+
 services:
   nginx:
     image: nginx:alpine
@@ -59,7 +73,7 @@ services:
       RAILS_RELATIVE_URL_ROOT: /auth
     volumes:
       - ./backend/auth-service:/app
-      - auth-bundle:/usr/local/bundle
+      - auth-bundle:/usr/local/bundle # Ensure that Gems aren't installed on each build
     depends_on:
       - auth-db
     networks:
@@ -74,8 +88,8 @@ services:
       MYSQL_DATABASE: auth_development
       MYSQL_USER: munchora
       MYSQL_PASSWORD: admin
-      MYSQL_LOG_BIN_TRUST_FUNCTION_CREATORS: 1
-    command: --default-authentication-plugin=mysql_native_password --log-bin-trust-function-creators=1
+#      MYSQL_LOG_BIN_TRUST_FUNCTION_CREATORS: 1
+#    command: --default-authentication-plugin=mysql_native_password --log-bin-trust-function-creators=1
     volumes:
       - auth-db-data:/var/lib/mysql
     networks:
@@ -93,7 +107,7 @@ services:
       RAILS_RELATIVE_URL_ROOT: /recipes
     volumes:
       - ./backend/recipes-service:/app
-      - recipes-bundle:/usr/local/bundle
+      - recipes-bundle:/usr/local/bundle # Ensure that Gems aren't installed on each build
     depends_on:
       - recipes-db
     networks:
@@ -108,8 +122,8 @@ services:
       MYSQL_ROOT_PASSWORD: admin
       MYSQL_USER: munchora
       MYSQL_PASSWORD: admin
-      MYSQL_LOG_BIN_TRUST_FUNCTION_CREATORS: 1
-    command: --default-authentication-plugin=mysql_native_password --log-bin-trust-function-creators=1
+#      MYSQL_LOG_BIN_TRUST_FUNCTION_CREATORS: 1
+#    command: --default-authentication-plugin=mysql_native_password --log-bin-trust-function-creators=1
     volumes:
       - recipes-db-data:/var/lib/mysql
     networks:
@@ -127,7 +141,7 @@ services:
       RAILS_RELATIVE_URL_ROOT: /shopping-lists
     volumes:
       - ./backend/shopping-lists-service:/app
-      - shopping-lists-bundle:/usr/local/bundle
+      - shopping-lists-bundle:/usr/local/bundle # Ensure that Gems aren't installed on each build
     depends_on:
       - shopping-lists-db
     networks:
@@ -142,8 +156,8 @@ services:
       MYSQL_ROOT_PASSWORD: admin
       MYSQL_USER: munchora
       MYSQL_PASSWORD: admin
-      MYSQL_LOG_BIN_TRUST_FUNCTION_CREATORS: 1
-    command: --default-authentication-plugin=mysql_native_password --log-bin-trust-function-creators=1
+#      MYSQL_LOG_BIN_TRUST_FUNCTION_CREATORS: 1
+#    command: --default-authentication-plugin=mysql_native_password --log-bin-trust-function-creators=1
     volumes:
       - shopping-lists-db-data:/var/lib/mysql
     networks:
