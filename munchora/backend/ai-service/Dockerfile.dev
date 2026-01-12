@@ -1,0 +1,25 @@
+FROM ruby:3.3
+
+# System deps
+RUN apt-get update -qq && apt-get install -y \
+    build-essential \
+    default-libmysqlclient-dev \
+    nodejs \
+    curl \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# App directory
+WORKDIR /app
+
+# Bundler config
+ENV BUNDLE_PATH=/usr/local/bundle \
+    BUNDLE_JOBS=4 \
+    BUNDLE_RETRY=3
+
+# Only copy Gemfiles (cacheable)
+COPY Gemfile Gemfile.lock ./
+
+RUN bundle install
+
+EXPOSE 3000
