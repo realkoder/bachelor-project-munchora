@@ -1,0 +1,7 @@
+Started GET "/notifications/up" for 151.101.193.227 at 2026-01-13 08:44:20 +0000
+Processing by Rails::HealthController#show as HTML
+  Rendering html template
+  Rendered html template (Duration: 0.3ms | GC: 0.0ms)
+Completed 200 OK in 10ms (Views: 7.2ms | GC: 0.0ms)
+
+

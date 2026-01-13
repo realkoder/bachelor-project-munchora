@@ -27,6 +27,26 @@ services:
     networks:
       - app-network
 
+  # ==============================
+  # RABBITMQ
+  # ==============================
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: 'rabbitmq'
+    ports:
+      - "5672:5672"
+      - "15672:15672" # GUI and management PORT
+      # - "15692:15692" # Port for exposing metrics to Prometheus
+    environment:
+      RABBITMQ_DEFAULT_USER: "guest"
+      RABBITMQ_DEFAULT_PASS: "guest"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+      - rabbitmq_log:/var/log/rabbitmq
+    networks:
+      - app-network
+    command: rabbitmq-server -rabbitmq_management listener [{port,15672}] -rabbitmq_prometheus [{port,15692}]
+
   ai:
     build:
       context: ./backend/ai-service
@@ -41,6 +61,7 @@ services:
       - ./backend/ai-service:/app
       - ai-bundle:/usr/local/bundle # Ensure that Gems aren't installed on each build
     depends_on:
+      - rabbitmq
       - ai-db
     networks:
       - app-network
@@ -54,8 +75,8 @@ services:
       MYSQL_ROOT_PASSWORD: admin
       MYSQL_USER: munchora
       MYSQL_PASSWORD: admin
-#      MYSQL_LOG_BIN_TRUST_FUNCTION_CREATORS: 1
-#    command: --default-authentication-plugin=mysql_native_password --log-bin-trust-function-creators=1
+    #      MYSQL_LOG_BIN_TRUST_FUNCTION_CREATORS: 1
+    #    command: --default-authentication-plugin=mysql_native_password --log-bin-trust-function-creators=1
     volumes:
       - ai-db-data:/var/lib/mysql
     networks:
@@ -75,6 +96,7 @@ services:
       - ./backend/auth-service:/app
       - auth-bundle:/usr/local/bundle # Ensure that Gems aren't installed on each build
     depends_on:
+      - rabbitmq
       - auth-db
     networks:
       - app-network
@@ -88,10 +110,28 @@ services:
       MYSQL_DATABASE: auth_development
       MYSQL_USER: munchora
       MYSQL_PASSWORD: admin
-#      MYSQL_LOG_BIN_TRUST_FUNCTION_CREATORS: 1
-#    command: --default-authentication-plugin=mysql_native_password --log-bin-trust-function-creators=1
+    #      MYSQL_LOG_BIN_TRUST_FUNCTION_CREATORS: 1
+    #    command: --default-authentication-plugin=mysql_native_password --log-bin-trust-function-creators=1
     volumes:
       - auth-db-data:/var/lib/mysql
+    networks:
+      - app-network
+
+  notifications:
+    build:
+      context: ./backend/notifications-service
+      dockerfile: Dockerfile.dev
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -b 0.0.0.0 -p 3000"
+    env_file:
+      - ./backend/notifications-service/.env.dev
+    environment:
+      RAILS_ENV: development
+      RAILS_RELATIVE_URL_ROOT: /notifications
+    volumes:
+      - ./backend/notifications-service:/app
+      - notifications-bundle:/usr/local/bundle # Ensure that Gems aren't installed on each build
+    depends_on:
+      - rabbitmq
     networks:
       - app-network
 
@@ -109,6 +149,7 @@ services:
       - ./backend/recipes-service:/app
       - recipes-bundle:/usr/local/bundle # Ensure that Gems aren't installed on each build
     depends_on:
+      - rabbitmq
       - recipes-db
     networks:
       - app-network
@@ -122,8 +163,8 @@ services:
       MYSQL_ROOT_PASSWORD: admin
       MYSQL_USER: munchora
       MYSQL_PASSWORD: admin
-#      MYSQL_LOG_BIN_TRUST_FUNCTION_CREATORS: 1
-#    command: --default-authentication-plugin=mysql_native_password --log-bin-trust-function-creators=1
+    #      MYSQL_LOG_BIN_TRUST_FUNCTION_CREATORS: 1
+    #    command: --default-authentication-plugin=mysql_native_password --log-bin-trust-function-creators=1
     volumes:
       - recipes-db-data:/var/lib/mysql
     networks:
@@ -143,6 +184,7 @@ services:
       - ./backend/shopping-lists-service:/app
       - shopping-lists-bundle:/usr/local/bundle # Ensure that Gems aren't installed on each build
     depends_on:
+      - rabbitmq
       - shopping-lists-db
     networks:
       - app-network
@@ -156,22 +198,25 @@ services:
       MYSQL_ROOT_PASSWORD: admin
       MYSQL_USER: munchora
       MYSQL_PASSWORD: admin
-#      MYSQL_LOG_BIN_TRUST_FUNCTION_CREATORS: 1
-#    command: --default-authentication-plugin=mysql_native_password --log-bin-trust-function-creators=1
+    #      MYSQL_LOG_BIN_TRUST_FUNCTION_CREATORS: 1
+    #    command: --default-authentication-plugin=mysql_native_password --log-bin-trust-function-creators=1
     volumes:
       - shopping-lists-db-data:/var/lib/mysql
     networks:
       - app-network
 
 volumes:
-  auth-db-data:
-  recipes-db-data:
-  shopping-lists-db-data:
   ai-db-data:
   ai-bundle:
   auth-bundle:
-  recipes-bundle:
+  auth-db-data:
   shopping-lists-bundle:
+  shopping-lists-db-data:
+  recipes-bundle:
+  recipes-db-data:
+  notifications-bundle:
+  rabbitmq_data: # Stores RabbitMQ data
+  rabbitmq_log: # Stores RabbitMQ logs
 
 
 networks:
