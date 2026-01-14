@@ -394,31 +394,31 @@ PLATFORMS
 
 DEPENDENCIES
   bcrypt (~> 3.1.7)
-  bootsnap
-  brakeman
+  bootsnap (~> 1.20.1)
+  brakeman (~> 7.1.2)
   debug
-  dotenv-rails
-  factory_bot_rails
-  faker
-  google-id-token
-  jwt
-  kamal
-  kaminari
+  dotenv-rails (~> 3.1)
+  factory_bot_rails (~> 6.5.1)
+  faker (~> 3.5.2)
+  google-id-token (~> 1.4.2)
+  jwt (~> 3.1.2)
+  kamal (~> 2.10.1)
+  kaminari (~> 1.2.2)
   mysql2 (~> 0.5)
   puma (>= 5.0)
-  rack-cors
+  rack-cors (~> 3.0.0)
   rails (~> 8.0.4)
-  rspec-rails
-  rubocop-rails-omakase
+  rspec-rails (~> 8.0.2)
+  rubocop-rails-omakase (~> 1.1.0)
   shoulda-matchers (~> 5.0)
-  simplecov
-  solid_cable
-  solid_cache
-  solid_queue
-  sqlite3
-  thruster
+  simplecov (~> 0.22.0)
+  solid_cable (~> 3.0.12)
+  solid_cache (~> 1.0)
+  solid_queue (~> 1.2)
+  sqlite3 (~> 2.9)
+  thruster (~> 0.1.17)
   tzinfo-data
-  webmock
+  webmock (~> 3.26.1)
 
 BUNDLED WITH
    2.7.1

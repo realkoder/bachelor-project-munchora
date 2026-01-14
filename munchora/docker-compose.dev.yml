@@ -7,11 +7,9 @@
 #                       // Deletes all images - JUST MAKE SURE VOLUMES WON'T BE DELETED
 #
 # Generate a mysql dump file: docker exec -i <servie-name> mysqldump -u root -padmin <db_name> > ./munchora_dump.sql
-#
 # Interact with running docker based mysql: docker exec -it <containerID / name> mysql -u root -padmin
-#
 # Interact with docker based rails app: docker-compose exec <docker name> bash
-
+# IF NEW GEM ADDED BUILD THE APP AGAIN: docker-compose -f docker-compose.dev.yml build <compose name - e.g. auth>
 # ADD MIGRATIONS: docker-compose exec <docker name> bundle exec rails db:migrate
 
 services:
