@@ -3,8 +3,8 @@ import axios from "axios";
 const isServer = typeof window === 'undefined';
 
 const BASE_URL = isServer
-    ? process.env.VITE_BASE_URL_SSR || 'http://localhost:3000/api/v1'
-    : import.meta.env.VITE_BASE_URL || 'http://localhost:3000/api/v1';
+    ? process.env.VITE_BASE_URL_SSR || 'http://localhost:3000'
+    : import.meta.env.VITE_BASE_URL || 'http://localhost:3000';
 
 const api = axios.create({
     baseURL: BASE_URL,

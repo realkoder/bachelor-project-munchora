@@ -32,7 +32,7 @@ export const SignIn = () => {
         <CardDescription className="flex flex-col items-center gap-4">
           Sign in to your account to continue cooking
           <a
-            href={import.meta.env.VITE_ENV !== 'production' ? 'http://localhost:3000/api/v1/auth/google' : 'https://munchora.pro/api/v1/auth/google'}
+            href={import.meta.env.VITE_ENV !== 'production' ? 'http://localhost:3000/auth/api/v1/auth/google' : 'https://munchora.pro/api/v1/auth/google'}
             className="btn"
           >
             <GoogleButton />

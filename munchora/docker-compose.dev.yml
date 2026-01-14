@@ -12,6 +12,8 @@
 #
 # Interact with docker based rails app: docker-compose exec <docker name> bash
 
+# ADD MIGRATIONS: docker-compose exec <docker name> bundle exec rails db:migrate
+
 services:
   # ==============================
   # NGINX
@@ -77,7 +79,6 @@ services:
       RAILS_RELATIVE_URL_ROOT: /ai
     volumes:
       - ./backend/ai-service:/app
-      - ai-bundle:/usr/local/bundle # Ensure that Gems aren't installed on each build
     depends_on:
       - rabbitmq
       - ai-db
@@ -113,7 +114,6 @@ services:
       RAILS_RELATIVE_URL_ROOT: /auth
     volumes:
       - ./backend/auth-service:/app
-      - auth-bundle:/usr/local/bundle # Ensure that Gems aren't installed on each build
     depends_on:
       - rabbitmq
       - auth-db
@@ -148,7 +148,6 @@ services:
       RAILS_RELATIVE_URL_ROOT: /notifications
     volumes:
       - ./backend/notifications-service:/app
-      - notifications-bundle:/usr/local/bundle # Ensure that Gems aren't installed on each build
     depends_on:
       - rabbitmq
     networks:
@@ -166,7 +165,6 @@ services:
       RAILS_RELATIVE_URL_ROOT: /recipes
     volumes:
       - ./backend/recipes-service:/app
-      - recipes-bundle:/usr/local/bundle # Ensure that Gems aren't installed on each build
     depends_on:
       - rabbitmq
       - recipes-db
@@ -201,7 +199,6 @@ services:
       RAILS_RELATIVE_URL_ROOT: /shopping-lists
     volumes:
       - ./backend/shopping-lists-service:/app
-      - shopping-lists-bundle:/usr/local/bundle # Ensure that Gems aren't installed on each build
     depends_on:
       - rabbitmq
       - shopping-lists-db
@@ -226,14 +223,9 @@ services:
 
 volumes:
   ai-db-data:
-  ai-bundle:
-  auth-bundle:
   auth-db-data:
-  shopping-lists-bundle:
   shopping-lists-db-data:
-  recipes-bundle:
   recipes-db-data:
-  notifications-bundle:
   rabbitmq_data: # Stores RabbitMQ data
   rabbitmq_log: # Stores RabbitMQ logs
 
