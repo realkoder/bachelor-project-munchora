@@ -1,0 +1,20 @@
+import { useEffect, useState } from "react";
+
+export function Greeting() {
+  const [greeting, setGreeting] = useState("");
+
+  useEffect(() => {
+    function getGreeting(): string {
+      const hour = new Date().getHours();
+      if (hour >= 5 && hour < 12) return "Good morning";
+      if (hour >= 12 && hour < 17) return "Good afternoon";
+      if (hour >= 17 && hour < 21) return "Good evening";
+      return "Good night";
+    }
+    setGreeting(getGreeting());
+  }, []);
+
+  if (!greeting) return null;
+
+  return <>{greeting}</>;
+}

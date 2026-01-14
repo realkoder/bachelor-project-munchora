@@ -13,6 +13,9 @@
 # Interact with docker based rails app: docker-compose exec <docker name> bash
 
 services:
+  # ==============================
+  # NGINX
+  # ==============================
   nginx:
     image: nginx:alpine
     ports:
@@ -47,6 +50,21 @@ services:
       - app-network
     command: rabbitmq-server -rabbitmq_management listener [{port,15672}] -rabbitmq_prometheus [{port,15692}]
 
+  # ==============================
+  # Frontend RRv7 APP
+  # ==============================
+  frontend-app:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    networks:
+      - app-network
+
   ai:
     build:
       context: ./backend/ai-service
@@ -65,6 +83,7 @@ services:
       - ai-db
     networks:
       - app-network
+
 
   ai-db:
     image: mysql:8.0
