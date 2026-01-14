@@ -42,6 +42,33 @@ end
 
 <br>
 
+# AUTH - JWT
+
+Using **Public / Private key (RS256)** for the JWT - private key is only known by _auth-service_ but public by all relevant servcies.
+
+```bash
+# Generate private key
+openssl genrsa -out jwt_private.pem 2048
+
+# Generate public key
+openssl rsa -in jwt_private.pem -pubout -out jwt_public.pem
+
+cd munchora/backend/auth-service
+# Depends on IDE / terminal only run one of below
+EDITOR="nano" rails credentials:edit
+EDITOR="idea --wait" rails credentials:edit
+```
+
+**Add the private and public key**
+
+```yml
+
+```
+
+---
+
+<br>
+
 # Testing
 
 ## Configuring RSpec
