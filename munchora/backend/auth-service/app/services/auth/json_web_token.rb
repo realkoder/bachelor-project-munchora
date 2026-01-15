@@ -7,6 +7,11 @@ class Auth::JsonWebToken
     Rails.application.credentials.jwt_public_key
   )
 
+  def self.encode_user(user, exp = 7.days.from_now)
+    payload = user.jwt_payload.merge(exp: exp.to_i)
+    JWT.encode(payload, PRIVATE_KEY, 'RS256')
+  end
+
   def self.encode(payload, exp = 7.days.from_now)
     payload[:exp] = exp.to_i
     JWT.encode(payload, PRIVATE_KEY, 'RS256')
@@ -16,6 +21,7 @@ class Auth::JsonWebToken
     decoded = JWT.decode(token, PUBLIC_KEY, true, algorithm: 'RS256')
     HashWithIndifferentAccess.new(decoded[0])
   rescue JWT::DecodeError
+    Rails.logger.warn "JWT decode failed: #{e.message}"
     nil
   end
 end

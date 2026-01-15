@@ -44,7 +44,8 @@ end
 
 # AUTH - JWT
 
-Using **Public / Private key (RS256)** for the JWT - private key is only known by _auth-service_ but public by all relevant servcies.
+Using **Public / Private key (RS256)** for the JWT - private key is only known by _auth-service_
+but public key known by all relevant services.
 
 ```bash
 # Generate private key
@@ -59,13 +60,64 @@ EDITOR="nano" rails credentials:edit
 EDITOR="idea --wait" rails credentials:edit
 ```
 
-**Add the private and public key**
+**Add the private and public keys**
 
-```yml
+```yaml
+jwt_private_key: |
+  -----BEGIN RSA PRIVATE KEY-----
+  MIIEpAIBAAKCAQEA2RnLGZvQG...
+  -----END RSA PRIVATE KEY-----
 
+jwt_public_key: |
+  -----BEGIN PUBLIC KEY-----
+  MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8A...
+  -----END PUBLIC KEY-----
 ```
 
 ---
+
+<br>
+---
+
+# Message Queue Servive-2-Service communication - RabbitMQ
+
+Following Gems are used:
+
+```ruby
+# RabbitMQ
+gem 'bunny'
+# Async jobs
+gem 'sidekiq'
+gem 'redis'
+```
+
+This is added to all services - `config/initializers/rabbitmq.rb`:
+
+```ruby
+require 'bunny'
+
+RABBITMQ_CONNECTION = Bunny.new(
+  host: ENV.fetch('RABBITMQ_HOST', 'localhost'),
+  port: ENV.fetch('RABBITMQ_PORT', 5672),
+  user: ENV.fetch('RABBITMQ_USER', 'guest'),
+  password: ENV.fetch('RABBITMQ_PASSWORD', 'guest')
+)
+
+RABBITMQ_CONNECTION.start
+
+RABBITMQ_CHANNEL = RABBITMQ_CONNECTION.create_channel
+
+# Define queues
+RECIPE_REQUEST_QUEUE = RABBITMQ_CHANNEL.queue('recipe.requests', durable: true)
+RECIPE_RESPONSE_QUEUE = RABBITMQ_CHANNEL.queue('recipe.responses', durable: true)
+
+# Graceful shutdown
+at_exit do
+  RABBITMQ_CHANNEL.close
+  RABBITMQ_CONNECTION.close
+end
+```
+
 
 <br>
 

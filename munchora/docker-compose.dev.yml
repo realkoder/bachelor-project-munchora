@@ -49,6 +49,11 @@ services:
     networks:
       - app-network
     command: rabbitmq-server -rabbitmq_management listener [{port,15672}] -rabbitmq_prometheus [{port,15692}]
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "check_port_connectivity" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   # ==============================
   # Frontend RRv7 APP
@@ -78,11 +83,42 @@ services:
     volumes:
       - ./backend/ai-service:/app
     depends_on:
-      - rabbitmq
-      - ai-db
+      ai-db:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
     networks:
       - app-network
 
+  ai-sidekiq:
+    build:
+      context: ./backend/ai-service
+      dockerfile: Dockerfile.dev
+    command: bundle exec sidekiq -C config/sidekiq.yml
+    env_file:
+      - ./backend/ai-service/.env.dev
+    environment:
+      RAILS_ENV: development
+    volumes:
+      - ./backend/ai-service:/app
+    depends_on:
+      ai-db:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - app-network
+
+#  ai-rabbitmq-consumer:
+#    build:
+#      context: ./backend/ai-service
+#      dockerfile: Dockerfile.dev
+#    command: bundle exec ruby lib/rabbitmq_consumer.rb
+#    depends_on:
+#      ai-db:
+#        condition: service_started
+#      rabbitmq:
+#        condition: service_healthy
 
   ai-db:
     image: mysql:8.0
@@ -113,8 +149,10 @@ services:
     volumes:
       - ./backend/auth-service:/app
     depends_on:
-      - rabbitmq
-      - auth-db
+      rabbitmq:
+        condition: service_healthy
+      auth-db:
+        condition: service_started
     networks:
       - app-network
 
@@ -147,7 +185,8 @@ services:
     volumes:
       - ./backend/notifications-service:/app
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
     networks:
       - app-network
 
@@ -164,8 +203,10 @@ services:
     volumes:
       - ./backend/recipes-service:/app
     depends_on:
-      - rabbitmq
-      - recipes-db
+      rabbitmq:
+        condition: service_healthy
+      recipes-db:
+        condition: service_started
     networks:
       - app-network
 
@@ -198,8 +239,10 @@ services:
     volumes:
       - ./backend/shopping-lists-service:/app
     depends_on:
-      - rabbitmq
-      - shopping-lists-db
+      rabbitmq:
+        condition: service_healthy
+      shopping-lists-db:
+        condition: service_started
     networks:
       - app-network
 

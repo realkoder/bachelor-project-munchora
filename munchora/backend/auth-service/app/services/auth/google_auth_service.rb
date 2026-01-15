@@ -54,6 +54,8 @@ class Auth::GoogleAuthService
       user.email = user_info['email']
       user.image_src = user_info['picture']
       user.save!
+    elsif user.uid.nil? || user.provider.nil?
+      User.update!({ provider: 'google', uid: user_info['id'] })
     end
     user
   end

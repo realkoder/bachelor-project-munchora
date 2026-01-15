@@ -11,7 +11,9 @@ class Api::V1::AuthController < ApplicationController
 
     user = Auth::GoogleAuthService.validate_code_and_get_user(code)
 
-    token = Auth::JsonWebToken.encode(user_id: user.id)
+    User.update!({ last_signed_in_at: DateTime.now })
+
+    token = Auth::JsonWebToken.encode_user(user)
     set_cookie(token)
 
     if Rails.env.production?
@@ -33,9 +35,10 @@ class Api::V1::AuthController < ApplicationController
 
   def login
     user = User.find_by(email: params[:email])
+    user.update!({ last_signed_in_at: DateTime.now })
 
-    if user&.authenticate(params[:password])
-      token = Auth::JsonWebToken.encode(user_id: user.id)
+    if user.authenticate(params[:password])
+      token = Auth::JsonWebToken.encode_user(user)
       set_cookie(token)
 
       render json: { user: user, token: token }
