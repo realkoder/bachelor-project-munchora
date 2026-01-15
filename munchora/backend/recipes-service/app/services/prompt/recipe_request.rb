@@ -2,13 +2,6 @@ class Prompt::RecipeRequest
   def self.request_recipe(prompt, current_user)
     correlation_id = SecureRandom.uuid
 
-    # Store request in Redis for correlation
-    REDIS_CLIENT.setex(
-      "ai_prompt_request:#{correlation_id}",
-      300, # 5 minutes TTL
-      { status: 'pending', prompt: prompt }.to_json
-    )
-
     # Publish to RabbitMQ
     message = {
       correlation_id: correlation_id,

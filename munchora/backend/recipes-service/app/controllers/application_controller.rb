@@ -78,8 +78,8 @@ class ApplicationController < ActionController::API
     end
 
     decoded_token = Auth::JsonWebToken.decode(token)
-    @current_user = CurrentUser.from_jwt(decoded_token)
-    if @current_user.nil? || !@current_user[:user_id]
+    @current_user = CurrentUser.from_jwt(decoded_token['user'])
+    if @current_user.nil? || !@current_user.id
       nil
     end
 

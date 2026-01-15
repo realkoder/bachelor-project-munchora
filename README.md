@@ -81,6 +81,11 @@ jwt_public_key: |
 
 # Message Queue Servive-2-Service communication - RabbitMQ
 
+Services are relying on message queue - RabbitMQ for communication with the use of
+background processing framework Sidekiq to ensure all messages won't block main thread.
+
+[Sidekiq ruby on rails guide](https://blog.appsignal.com/2023/09/20/an-introduction-to-sidekiq-for-ruby-on-rails.html)
+
 Following Gems are used:
 
 ```ruby
@@ -117,7 +122,6 @@ at_exit do
   RABBITMQ_CONNECTION.close
 end
 ```
-
 
 <br>
 

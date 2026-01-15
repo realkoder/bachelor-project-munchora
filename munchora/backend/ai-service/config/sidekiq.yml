@@ -1,4 +1,4 @@
-:concurrency: 5
+:concurrency: 10
 :queues:
-  - default
-  - prompt_generation
+  - [prompt_generation, 5]
+  - [default, 1]

@@ -28,7 +28,6 @@ Rails.application.routes.draw do
         # RECIPE_PROMPT
         post 'prompt-recipe', to: 'prompt_recipe#generate'
         put 'prompt-recipe', to: 'prompt_recipe#update'
-        get 'prompt-recipe/status', to: 'prompt_recipe#status'
       end
     end
   end

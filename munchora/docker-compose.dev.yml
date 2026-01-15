@@ -11,6 +11,7 @@
 # Interact with docker based rails app: docker-compose exec <docker name> bash
 # IF NEW GEM ADDED BUILD THE APP AGAIN: docker-compose -f docker-compose.dev.yml build <compose name - e.g. auth>
 # ADD MIGRATIONS: docker-compose exec <docker name> bundle exec rails db:migrate
+# Trigger hotreload by reloading service: docker-compose -f docker-compose.dev.yml restart recipes-rabbitmq-consumer
 
 services:
   # ==============================
@@ -70,55 +71,57 @@ services:
     networks:
       - app-network
 
-  ai:
+  # ==============================
+  # AI DOMAIN
+  # ==============================
+  x-ai-service: &ai-service
+    image: ai-service:dev
+    env_file:
+      - ./backend/ai-service/.env.dev
+    volumes:
+      - ./backend/ai-service:/app
+    networks:
+      - app-network
+
+  ai-build:
+    image: ai-service:dev
     build:
       context: ./backend/ai-service
       dockerfile: Dockerfile.dev
+
+  ai:
+    <<: *ai-service
     command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -b 0.0.0.0 -p 3000"
-    env_file:
-      - ./backend/ai-service/.env.dev
     environment:
       RAILS_ENV: development
       RAILS_RELATIVE_URL_ROOT: /ai
-    volumes:
-      - ./backend/ai-service:/app
     depends_on:
       ai-db:
         condition: service_started
       rabbitmq:
         condition: service_healthy
-    networks:
-      - app-network
 
-  ai-sidekiq:
-    build:
-      context: ./backend/ai-service
-      dockerfile: Dockerfile.dev
-    command: bundle exec sidekiq -C config/sidekiq.yml
-    env_file:
-      - ./backend/ai-service/.env.dev
+  ai-rabbitmq-consumer:
+    <<: *ai-service
+    command: bundle exec ruby lib/rabbitmq_consumer_runner.rb
     environment:
       RAILS_ENV: development
-    volumes:
-      - ./backend/ai-service:/app
     depends_on:
       ai-db:
         condition: service_started
       rabbitmq:
         condition: service_healthy
-    networks:
-      - app-network
 
-#  ai-rabbitmq-consumer:
-#    build:
-#      context: ./backend/ai-service
-#      dockerfile: Dockerfile.dev
-#    command: bundle exec ruby lib/rabbitmq_consumer.rb
-#    depends_on:
-#      ai-db:
-#        condition: service_started
-#      rabbitmq:
-#        condition: service_healthy
+  ai-sidekiq:
+    <<: *ai-service
+    command: bundle exec sidekiq -C config/sidekiq.yml
+    environment:
+      RAILS_ENV: development
+    depends_on:
+      ai-db:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
 
   ai-db:
     image: mysql:8.0
@@ -129,13 +132,14 @@ services:
       MYSQL_ROOT_PASSWORD: admin
       MYSQL_USER: munchora
       MYSQL_PASSWORD: admin
-    #      MYSQL_LOG_BIN_TRUST_FUNCTION_CREATORS: 1
-    #    command: --default-authentication-plugin=mysql_native_password --log-bin-trust-function-creators=1
     volumes:
       - ai-db-data:/var/lib/mysql
     networks:
       - app-network
 
+  # ==============================
+  # AUTH DOMAIN
+  # ==============================
   auth:
     build:
       context: ./backend/auth-service
@@ -172,6 +176,9 @@ services:
     networks:
       - app-network
 
+  # ==============================
+  # NOTIFICATIONS DOMAIN
+  # ==============================
   notifications:
     build:
       context: ./backend/notifications-service
@@ -190,13 +197,27 @@ services:
     networks:
       - app-network
 
-  recipes:
+  # ==============================
+  # RECIPES DOMAIN
+  # ==============================
+  x-recipes-service: &recipes-service
+    image: recipes-service:dev
+    env_file:
+      - ./backend/recipes-service/.env.dev
+    volumes:
+      - ./backend/recipes-service:/app
+    networks:
+      - app-network
+
+  recipes-build:
+    image: recipes-service:dev
     build:
       context: ./backend/recipes-service
       dockerfile: Dockerfile.dev
+
+  recipes:
+    <<: *recipes-service
     command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -b 0.0.0.0 -p 3000"
-    env_file:
-      - ./backend/recipes-service/.env.dev
     environment:
       RAILS_ENV: development
       RAILS_RELATIVE_URL_ROOT: /recipes
@@ -207,8 +228,17 @@ services:
         condition: service_healthy
       recipes-db:
         condition: service_started
-    networks:
-      - app-network
+
+  recipes-rabbitmq-consumer:
+    <<: *recipes-service
+    command: bundle exec rails runner lib/rabbitmq_consumer_runner.rb
+    environment:
+      RAILS_ENV: development
+    depends_on:
+      recipes-db:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
 
   recipes-db:
     image: mysql:8.0
@@ -219,13 +249,14 @@ services:
       MYSQL_ROOT_PASSWORD: admin
       MYSQL_USER: munchora
       MYSQL_PASSWORD: admin
-    #      MYSQL_LOG_BIN_TRUST_FUNCTION_CREATORS: 1
-    #    command: --default-authentication-plugin=mysql_native_password --log-bin-trust-function-creators=1
     volumes:
       - recipes-db-data:/var/lib/mysql
     networks:
       - app-network
 
+  # ==============================
+  # SHOPPING_LISTS DOMAIN
+  # ==============================
   shopping-lists:
     build:
       context: ./backend/shopping-lists-service
@@ -255,8 +286,6 @@ services:
       MYSQL_ROOT_PASSWORD: admin
       MYSQL_USER: munchora
       MYSQL_PASSWORD: admin
-    #      MYSQL_LOG_BIN_TRUST_FUNCTION_CREATORS: 1
-    #    command: --default-authentication-plugin=mysql_native_password --log-bin-trust-function-creators=1
     volumes:
       - shopping-lists-db-data:/var/lib/mysql
     networks:

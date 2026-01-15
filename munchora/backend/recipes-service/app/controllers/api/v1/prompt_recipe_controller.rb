@@ -20,17 +20,6 @@ class Api::V1::PromptRecipeController < ApplicationController
     render json: { msg: 'IMPLEMENT ME' }
   end
 
-  def status
-    correlation_id = params[:correlation_id]
-    result = Redis.current.get("recipe_request:#{correlation_id}")
-
-    if result
-      render json: JSON.parse(result)
-    else
-      render json: { error: 'Request not found' }, status: :not_found
-    end
-  end
-
   private
 
   def set_recipe

@@ -35,11 +35,11 @@ class Api::V1::AuthController < ApplicationController
 
   def login
     user = User.find_by(email: params[:email])
-    user.update!({ last_signed_in_at: DateTime.now })
 
-    if user.authenticate(params[:password])
+    if user && user.authenticate(params[:password])
       token = Auth::JsonWebToken.encode_user(user)
       set_cookie(token)
+      user.update!({ last_signed_in_at: DateTime.now })
 
       render json: { user: user, token: token }
     else

@@ -10,9 +10,7 @@ class LlmPromptGeneratorWorker
     correlation_id = data['correlation_id']
 
     begin
-      puts "THIS IS AMAZING!!"
-      puts correlation_id
-      puts data
+      ProcessedPrompt.create!(correlation_id: correlation_id)
 
       # Generate recipe using your AI service
       prompt_result = prompt_llm(data)
@@ -21,6 +19,7 @@ class LlmPromptGeneratorWorker
         correlation_id: correlation_id,
         status: 'completed',
         prompt_result: prompt_result,
+        user_id: data['user_id'],
         generated_at: Time.current.iso8601
       }.to_json
 

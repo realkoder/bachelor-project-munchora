@@ -35,16 +35,14 @@ gem "thruster", require: false
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin Ajax possible
 # gem "rack-cors"
 
+# Pagination
+gem 'kaminari', '~> 1.2.2'
+
 # Jwt for auth
 gem 'jwt', '~> 3.1.2'
 
 # RabbitMQ
 gem 'bunny'
-
-# Async jobs
-gem 'sidekiq'
-
-gem 'redis'
 
 # To enable dotenv files
 gem 'dotenv-rails', groups: [:development, :test]

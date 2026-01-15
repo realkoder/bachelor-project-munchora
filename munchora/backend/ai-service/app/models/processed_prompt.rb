@@ -1,0 +1,2 @@
+class ProcessedPrompt < ApplicationRecord
+end

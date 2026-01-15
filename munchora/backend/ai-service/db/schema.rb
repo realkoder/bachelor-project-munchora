@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_01_15_084949) do
+ActiveRecord::Schema[8.0].define(version: 2026_01_15_144754) do
   create_table "llm_usages", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.integer "user_id"
     t.string "provider"
@@ -22,5 +22,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_15_084949) do
     t.datetime "updated_at", null: false
     t.index ["user_id", "created_at"], name: "index_llm_usages_on_user_id_and_created_at"
     t.index ["user_id"], name: "index_llm_usages_on_user_id"
+  end
+
+  create_table "processed_prompts", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "correlation_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["correlation_id"], name: "index_processed_prompts_on_correlation_id", unique: true
   end
 end
