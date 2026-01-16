@@ -10,11 +10,23 @@ class AiResponseConsumer
     AI_PROMPT_RESPONSE_QUEUE.subscribe(manual_ack: true) do |delivery_info, properties, payload|
       begin
         puts "[RabbitMQ] Received AI response: #{payload}"
-        data = JSON.parse(payload.force_encoding('UTF-8'))
+        parsed_payload = JSON.parse(payload.force_encoding('UTF-8'))
 
-        recipe = self.validate_recipe_response(data)
+        recipe = self.validate_recipe_response(parsed_payload)
+
+        recipe_author = RecipeAuthor.find_or_initialize_by(user_id: parsed_payload['user']['id'])
+
+        if recipe_author.new_record?
+          recipe_author.user_id = parsed_payload['user']['id']
+          recipe_author.first_name = parsed_payload['user']['first_name']
+          recipe_author.last_name = parsed_payload['user']['last_name']
+          recipe_author.image_src = parsed_payload['user']['image_src']
+          recipe_author.bio = parsed_payload['user']['bio']
+          recipe_author.save!
+        end
 
         recipe_attributes = {
+          recipe_author: recipe_author,
           title: recipe['title'],
           description: recipe['description'],
           instructions: recipe['instructions'],
@@ -25,7 +37,6 @@ class AiResponseConsumer
           prep_time: recipe['prep_time'],
           cook_time: recipe['cook_time'],
           servings: recipe['servings'],
-          user_id: data['user_id']
         }
 
         created_recipe = Recipe.create!(recipe_attributes)

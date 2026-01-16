@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_01_15_092634) do
+ActiveRecord::Schema[8.0].define(version: 2026_01_16_191246) do
   create_table "ingredients", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name"
     t.string "category"
@@ -19,6 +19,17 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_15_092634) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["recipe_id"], name: "index_ingredients_on_recipe_id"
+  end
+
+  create_table "recipe_authors", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.integer "user_id"
+    t.string "first_name"
+    t.string "last_name"
+    t.string "image_src"
+    t.string "bio"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_recipe_authors_on_user_id", unique: true
   end
 
   create_table "recipes", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -36,6 +47,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_15_092634) do
     t.integer "servings", default: 1
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "recipe_author_id"
+    t.index ["recipe_author_id"], name: "index_recipes_on_recipe_author_id"
     t.index ["user_id", "is_public"], name: "index_recipes_on_user_id_and_is_public"
     t.index ["user_id"], name: "index_recipes_on_user_id"
   end

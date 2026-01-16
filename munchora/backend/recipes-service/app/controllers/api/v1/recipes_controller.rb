@@ -51,7 +51,7 @@ class Api::V1::RecipesController < ApplicationController
       data: paginated_recipes.as_json(
         include: {
           ingredients: { only: [:id, :name, :category, :amount] },
-          # user: { only: [:image_src, :id] },
+          recipe_author: {},
           # recipe_likes: {},
           # recipe_comments: {}
         }

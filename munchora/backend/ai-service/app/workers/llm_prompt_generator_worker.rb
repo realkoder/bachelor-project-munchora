@@ -19,7 +19,7 @@ class LlmPromptGeneratorWorker
         correlation_id: correlation_id,
         status: 'completed',
         prompt_result: prompt_result,
-        user_id: data['user_id'],
+        user: data['user'],
         generated_at: Time.current.iso8601
       }.to_json
 
@@ -50,11 +50,11 @@ class LlmPromptGeneratorWorker
   private
 
   def prompt_llm(data)
-    raise_limit_exceeded! if usage_limit_exceeded?(data['user_email'], data['user_id'])
+    raise_limit_exceeded! if usage_limit_exceeded?(data['user']['email'], data['user']['id'])
 
     output = prompt_to_generate_output(data['prompt'])
 
-    log_usage(data['user_id'], data['prompt'], output.usage, output.model)
+    log_usage(data['user']['id'], data['prompt'], output.usage, output.model)
     output
   end
 

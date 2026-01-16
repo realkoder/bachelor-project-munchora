@@ -1,5 +1,5 @@
 class Recipe < ApplicationRecord
-  has_many :llm_usages, dependent: :nullify
+  belongs_to :recipe_author, optional: true
   has_many :ingredients, dependent: :destroy
   # has_many :recipe_comments, dependent: :destroy
   # has_many :recipe_likes, dependent: :destroy
