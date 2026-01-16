@@ -14,10 +14,10 @@ class AiResponseConsumer
 
         recipe = self.validate_recipe_response(parsed_payload)
 
-        recipe_author = RecipeAuthor.find_or_initialize_by(user_id: parsed_payload['user']['id'])
+        recipe_author = RecipeAuthor.find_or_initialize_by(auth_user_id: parsed_payload['user']['id'])
 
         if recipe_author.new_record?
-          recipe_author.user_id = parsed_payload['user']['id']
+          recipe_author.auth_user_id = parsed_payload['user']['id']
           recipe_author.first_name = parsed_payload['user']['first_name']
           recipe_author.last_name = parsed_payload['user']['last_name']
           recipe_author.image_src = parsed_payload['user']['image_src']

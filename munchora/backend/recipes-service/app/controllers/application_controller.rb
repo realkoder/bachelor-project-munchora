@@ -15,9 +15,7 @@ class ApplicationController < ActionController::API
                if: -> do
                  (request.post? || request.put?) &&
                    [
-                     '/ai/api/v1/llm/generate-recipe',
-                     %r{/ai/api/v1/llm/generate-recipe-image/\d+},
-                     %r{/ai/api/v1/llm/update-recipe/\d+},
+                     '/recipes/api/v1/prompt-recipe',
                    ].any? do |path|
                      path.is_a?(Regexp) ? request.path.match?(path) : request.path == path
                    end

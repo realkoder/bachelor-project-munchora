@@ -22,18 +22,17 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_16_191246) do
   end
 
   create_table "recipe_authors", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.integer "user_id"
+    t.integer "auth_user_id"
     t.string "first_name"
     t.string "last_name"
     t.string "image_src"
     t.string "bio"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["user_id"], name: "index_recipe_authors_on_user_id", unique: true
+    t.index ["auth_user_id"], name: "index_recipe_authors_on_auth_user_id", unique: true
   end
 
   create_table "recipes", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
-    t.integer "user_id"
     t.string "title"
     t.text "description"
     t.string "image_url"
@@ -49,8 +48,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_16_191246) do
     t.datetime "updated_at", null: false
     t.bigint "recipe_author_id"
     t.index ["recipe_author_id"], name: "index_recipes_on_recipe_author_id"
-    t.index ["user_id", "is_public"], name: "index_recipes_on_user_id_and_is_public"
-    t.index ["user_id"], name: "index_recipes_on_user_id"
   end
 
   add_foreign_key "ingredients", "recipes"
