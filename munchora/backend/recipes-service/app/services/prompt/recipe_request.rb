@@ -14,8 +14,9 @@ class Prompt::RecipeRequest
     message = {
       correlation_id: correlation_id,
       user: user_context,
-      system_instructions: Prompt::RecipeLlmInstruction::SYSTEM_PROMPT,
+      system_instruction: Prompt::RecipeLlmInstruction::SYSTEM_PROMPT,
       prompt: prompt,
+      output_as_json: true,
       timestamp: Time.current.iso8601
     }
 

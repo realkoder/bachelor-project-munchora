@@ -7,6 +7,9 @@ Rails.application.routes.draw do
     get 'up' => 'rails/health#show', as: :rails_health_check
     namespace :api do
       namespace :v1 do
+        # LLM PROMPT
+        post "prompt", to: 'llm#prompt'
+
         # Test
         get 'test', to: 'test#test'
       end

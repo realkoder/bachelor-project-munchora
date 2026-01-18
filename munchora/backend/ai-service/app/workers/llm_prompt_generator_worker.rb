@@ -1,25 +1,27 @@
+require 'ostruct'
+
 class LlmPromptGeneratorWorker
   include Sidekiq::Worker
-
-  DAILY_LIMIT = 10
 
   sidekiq_options queue: 'prompt_generation', retry: 3
 
   def perform(message_payload)
     data = JSON.parse(message_payload)
-    correlation_id = data['correlation_id']
+    data = OpenStruct.new(data)
+
+    correlation_id = data.correlation_id
 
     begin
       ProcessedPrompt.create!(correlation_id: correlation_id)
+      user = OpenStruct.new(data.user)
 
-      # Generate recipe using your AI service
-      prompt_result = prompt_llm(data)
+      prompt_result = Llm::LlmService.prompt_llm(user, data.prompt, data.system_instruction, data.output_as_json)
 
       response = {
         correlation_id: correlation_id,
         status: 'completed',
         prompt_result: prompt_result,
-        user: data['user'],
+        user: data.user,
         generated_at: Time.current.iso8601
       }.to_json
 
@@ -45,55 +47,5 @@ class LlmPromptGeneratorWorker
         correlation_id: correlation_id
       )
     end
-  end
-
-  private
-
-  def prompt_llm(data)
-    raise_limit_exceeded! if usage_limit_exceeded?(data['user']['email'], data['user']['id'])
-
-    output = prompt_to_generate_output(data['prompt'])
-
-    log_usage(data['user']['id'], data['prompt'], output.usage, output.model)
-    output
-  end
-
-  def usage_limit_exceeded?(user_email, user_id)
-    if user_email == 'alexanderbtcc@gmail.com'
-      return false
-    end
-    LlmUsage.where(user_id: user_id)
-            .where('created_at >= ?', Time.current.beginning_of_day)
-            .limit(DAILY_LIMIT + 1)
-            .count > DAILY_LIMIT
-  end
-
-  def raise_limit_exceeded!
-    raise LlmUsageLimitExceeded, "Daily AI usage limit (#{DAILY_LIMIT}) reached."
-  end
-
-  def prompt_to_generate_output(prompt)
-    OpenAIClient.chat.completions.create(
-      model: 'gpt-4.1-mini',
-      response_format: { type: 'json_object' },
-      messages: [
-        { role: 'system', content: Llm::RecipeLlmInstruction::SYSTEM_PROMPT },
-        { role: 'user', content: prompt }
-      ],
-      max_tokens: 2000
-    )
-  end
-
-  def log_usage(user_id, prompt, usage, model)
-    return unless usage
-
-    LlmUsage.create!(
-      user_id: user_id,
-      prompt: prompt,
-      model: model,
-      provider: 'openai',
-      prompt_tokens: usage.prompt_tokens,
-      completion_tokens: usage.completion_tokens,
-    )
   end
 end
