@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/ai-service.iml" filepath="$PROJECT_DIR$/.idea/modules/ai-service.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/auth-service.iml" filepath="$PROJECT_DIR$/.idea/modules/auth-service.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/bachelor-project.iml" filepath="$PROJECT_DIR$/.idea/bachelor-project.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/notifications-service.iml" filepath="$PROJECT_DIR$/.idea/modules/notifications-service.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/recipes-service.iml" filepath="$PROJECT_DIR$/.idea/modules/recipes-service.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/shopping-lists-service.iml" filepath="$PROJECT_DIR$/.idea/modules/shopping-lists-service.iml" />
     </modules>

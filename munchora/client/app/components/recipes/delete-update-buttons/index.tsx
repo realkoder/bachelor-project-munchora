@@ -19,7 +19,7 @@ export const DeleteUpdateRecipeBtns = ({ recipe }: DeleteUpdateRecipeBtnsProps) 
 
   return (
     <>
-      {(recipe.user.id === curUser?.user?.id || curUser?.user?.id === ADMIN_USER_ID) && (
+      {(recipe.recipe_author.id === curUser?.user?.id || curUser?.user?.id === ADMIN_USER_ID) && (
         <div className=" flex justify-center space-x-2">
           <Button
             onClick={() => {

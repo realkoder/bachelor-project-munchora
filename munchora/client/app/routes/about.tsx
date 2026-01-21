@@ -47,7 +47,7 @@ export default function About() {
                 <Zap className="h-8 w-8 text-white" />
               </div>
               <h3 className="font-semibold text-gray-900">Efficient</h3>
-              <p className="text-sm text-gray-600">Smart grocery planning</p>
+              <p className="text-sm text-gray-600">Smart shopping planning</p>
             </div>
           </div>
         </div>
@@ -81,9 +81,9 @@ export default function About() {
               <div className="bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
                 <ShoppingCart className="h-10 w-10 text-green-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-4">Smart Grocery Management</h3>
+              <h3 className="text-xl font-semibold mb-4">Smart Shopping Management</h3>
               <p className="text-gray-600 mb-4">
-                Automatically generate shopping lists from your recipes and organize your grocery shopping with intelligent categorization.
+                Automatically generate shopping lists from your recipes and organize your shopping shopping with intelligent categorization.
               </p>
               <ul className="text-sm text-gray-600 space-y-1">
                 <li>• Auto-generated shopping lists</li>
@@ -101,11 +101,11 @@ export default function About() {
               </div>
               <h3 className="text-xl font-semibold mb-4">Social Cooking Experience</h3>
               <p className="text-gray-600 mb-4">
-                Share your favorite recipes and collaborate on grocery lists with family and friends for better meal planning.
+                Share your favorite recipes and collaborate on shopping lists with family and friends for better meal planning.
               </p>
               <ul className="text-sm text-gray-600 space-y-1">
                 <li>• Recipe sharing</li>
-                <li>• Collaborative grocery lists</li>
+                <li>• Collaborative shopping lists</li>
                 <li>• Family meal planning</li>
                 <li>• Community features</li>
               </ul>

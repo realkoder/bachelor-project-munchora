@@ -4,7 +4,7 @@ import { Button } from '~/components/ui/button';
 import { BookA, ChefHat, House, MessageCircleQuestion, ShoppingCart, Sparkles, Menu, X, ShieldCheck } from 'lucide-react';
 import UserMenu from '~/components/user-menu';
 import useNotifications from '~/hooks/useNotifications';
-import useFetchGroceryLists from '~/hooks/fetching/useFetchGroceryLists';
+import useFetchShoppingLists from '~/hooks/fetching/useFetchShoppingLists';
 import { useAtomValue } from 'jotai';
 import { curUserAtom } from '~/atoms/curUserAtom';
 import {ADMIN_USER_ID} from "~/constants/admin-constants";
@@ -14,7 +14,7 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const curUser = useAtomValue(curUserAtom);
   useNotifications();
-  useFetchGroceryLists();
+  useFetchShoppingLists();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -34,10 +34,10 @@ export default function Navbar() {
           <span className={`${isActive('/recipes') ? 'border-black border-b' : ''} ml-2`}>Generate Recipe</span>
         </Button>
       </NavLink>
-      <NavLink to="/grocery-lists" onClick={onClick}>
+      <NavLink to="/shopping-lists" onClick={onClick}>
         <Button variant="ghost" className="flex items-center w-full justify-start">
           <ShoppingCart className="h-4 w-4" />
-          <span className={`${isActive('/grocery-lists') ? 'border-black border-b' : ''} ml-2`}>Grocery Lists</span>
+          <span className={`${isActive('/shopping-lists') ? 'border-black border-b' : ''} ml-2`}>Shopping Lists</span>
         </Button>
       </NavLink>
       <NavLink to="/faq" onClick={onClick}>

@@ -66,7 +66,7 @@ class Api::V1::RecipesController < ApplicationController
 
   def show
     if @recipe.is_public || current_user&.email == ADMIN_EMAIL || (current_user && @recipe.user_id == current_user.id)
-      render json: @recipe.as_json(include: { ingredients: { only: [:id, :name, :category, :amount] }, user: { only: [:image_src, :id] } })
+      render json: @recipe.as_json(include: { ingredients: { only: [:id, :name, :category, :amount] }, recipe_author: {} })
     else
       head :forbidden
     end
@@ -98,7 +98,7 @@ class Api::V1::RecipesController < ApplicationController
     render json: @recipe.as_json(
       include: {
         ingredients: { only: [:id, :name, :category, :amount] },
-        user: { only: [:image_src, :id] }
+        recipe_author: {}
       }
     )
   rescue ActiveRecord::RecordInvalid => e

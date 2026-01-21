@@ -1,4 +1,4 @@
-declare type PageName = 'indexNoAuth' | 'indexAuth' | 'recipe' | 'recipes' | 'recipeUpdate' | 'groceryLists' | 'profile' | 'signIn';
+declare type PageName = 'indexNoAuth' | 'indexAuth' | 'recipe' | 'recipes' | 'recipeUpdate' | 'shoppingLists' | 'profile' | 'signIn';
 
 declare namespace Cypress {
   interface Chainable {

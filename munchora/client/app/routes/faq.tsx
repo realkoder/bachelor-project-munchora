@@ -22,7 +22,7 @@ export default function Faq() {
         {
           question: 'Is Munchora free to use?',
           answer:
-            'Yes! Munchora offers a generous free tier that includes AI recipe generation, basic grocery list management, and recipe saving. We also offer premium features for users who want advanced functionality like unlimited recipe generation and enhanced sharing options.',
+            'Yes! Munchora offers a generous free tier that includes AI recipe generation, basic shopping list management, and recipe saving. We also offer premium features for users who want advanced functionality like unlimited recipe generation and enhanced sharing options.',
         },
         {
           question: 'Do I need to download an app?',
@@ -57,22 +57,22 @@ export default function Faq() {
       ],
     },
     {
-      title: 'Grocery Lists',
+      title: 'Shopping Lists',
       questions: [
         {
-          question: 'How do grocery lists work?',
+          question: 'How do shopping lists work?',
           answer:
-            'You can create multiple grocery lists for different occasions - weekly shopping, dinner parties, or meal prep. Add items manually or automatically generate lists from your saved recipes. Items are automatically categorized (produce, meat, dairy, etc.) for easier shopping.',
+            'You can create multiple shopping lists for different occasions - weekly shopping, dinner parties, or meal prep. Add items manually or automatically generate lists from your saved recipes. Items are automatically categorized (produce, meat, dairy, etc.) for easier shopping.',
         },
         {
-          question: 'Can I share grocery lists with family?',
+          question: 'Can I share shopping lists with family?',
           answer:
-            'Yes! You can share grocery lists with family members or roommates. Everyone with access can add items, check off completed purchases, and see real-time updates. Perfect for collaborative meal planning!',
+            'Yes! You can share shopping lists with family members or roommates. Everyone with access can add items, check off completed purchases, and see real-time updates. Perfect for collaborative meal planning!',
         },
         {
-          question: 'Do grocery lists work offline?',
+          question: 'Do shopping lists work offline?',
           answer:
-            "Your grocery lists are accessible offline once loaded. You can check off items and add new ones even without internet connection. Changes will sync automatically when you're back online.",
+            "Your shopping lists are accessible offline once loaded. You can check off items and add new ones even without internet connection. Changes will sync automatically when you're back online.",
         },
       ],
     },
@@ -87,7 +87,7 @@ export default function Faq() {
         {
           question: 'Can I collaborate on meal planning?',
           answer:
-            'Yes! You can create shared grocery lists and recipe collections with family or friends. Everyone can contribute recipe ideas, add ingredients to shopping lists, and coordinate meal preparation.',
+            'Yes! You can create shared shopping lists and recipe collections with family or friends. Everyone can contribute recipe ideas, add ingredients to shopping lists, and coordinate meal preparation.',
         },
         {
           question: 'Is there a community feature?',
@@ -112,7 +112,7 @@ export default function Faq() {
         {
           question: 'How do I delete my account?',
           answer:
-            "You can delete your account from the Account Settings page. This will permanently remove all your data, including saved recipes and grocery lists. We'll send a confirmation email before processing the deletion.",
+            "You can delete your account from the Account Settings page. This will permanently remove all your data, including saved recipes and shopping lists. We'll send a confirmation email before processing the deletion.",
         },
       ],
     },
@@ -137,7 +137,7 @@ export default function Faq() {
         {
           question: 'Can I use Munchora on my phone?',
           answer:
-            'Munchora is fully responsive and works great on mobile devices. The interface adapts to your screen size for easy recipe browsing and grocery list management on the go.',
+            'Munchora is fully responsive and works great on mobile devices. The interface adapts to your screen size for easy recipe browsing and shopping list management on the go.',
         },
       ],
     },

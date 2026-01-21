@@ -81,7 +81,7 @@ class Api::V1::ShoppingListsController < ApplicationController
     update_attrs[:category] = params[:category] if params[:category].present?
 
     item.update!(update_attrs)
-    # ShoppingLists::NotifyEvents.item_updated(@shopping_list, item)
+    ShoppingLists::NotifyEvents.item_updated(@shopping_list, item)
     render json: item
   end
 

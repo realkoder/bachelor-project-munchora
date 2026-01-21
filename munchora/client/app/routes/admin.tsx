@@ -12,7 +12,7 @@ export function meta({}: Route.MetaArgs) {
 
 type TMetricsTitle =
   | 'TotalUsers'
-  | 'GroceryLists'
+  | 'ShoppingLists'
   | 'SharedListRelations'
   | 'RecipesGenerated'
   | 'AIPrompts'
@@ -30,7 +30,7 @@ export default function Admin() {
   const { fetchData } = useFetch<{ stats: IMetrics[] }>();
   const [stats, setStats] = useState([
     { title: 'Total Users', value: '0', icon: Users },
-    { title: 'Grocery Lists', value: '0', icon: ShoppingBasket },
+    { title: 'Shopping Lists', value: '0', icon: ShoppingBasket },
     { title: 'Shared List Relations', value: '0', icon: UsersIcon },
     { title: 'Recipes Generated', value: '0', icon: TrendingUp },
     { title: 'AI Prompts', value: '0', icon: Brain },

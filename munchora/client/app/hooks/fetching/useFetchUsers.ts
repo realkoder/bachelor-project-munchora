@@ -9,7 +9,7 @@ const useFetchUsers = (page: number, filters?: IFilters) => {
   const [users, setUsers] = useAtom(usersAtom);
   const [pagination, setPagination] = useState<IPaginationMeta>();
 
-  const { data, isLoading, error, refetch } = usePaginatedQuery<IUser[]>('/users', page, 10, 'users', filters);
+  const { data, isLoading, error, refetch } = usePaginatedQuery<IUser[]>('/auth/api/v1/users', page, 10, 'users', filters);
 
   useEffect(() => {
     if (data?.data) {

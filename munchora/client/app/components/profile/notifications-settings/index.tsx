@@ -49,8 +49,8 @@ export default function NotificationsSettings() {
         <Separator />
         <div className="flex items-center justify-between">
           <div>
-            <Label htmlFor="list-notifications">Grocery List Updates</Label>
-            <p className="text-sm text-slate-500">Changes to shared grocery lists</p>
+            <Label htmlFor="list-notifications">Shopping List Updates</Label>
+            <p className="text-sm text-slate-500">Changes to shared shopping lists</p>
           </div>
           <Switch id="list-notifications" checked={notifications.lists} onCheckedChange={(checked) => setNotifications({ ...notifications, lists: checked })} />
         </div>

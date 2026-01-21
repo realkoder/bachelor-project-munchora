@@ -1,18 +1,17 @@
-// hooks/useNotifications.ts
-import { useEffect, useState } from 'react';
-import { Consumer, createConsumer } from '@rails/actioncable';
-import useGroceryListsEvents from './useGrocerylistEvents';
+import {useEffect, useState} from 'react';
+import {Consumer, createConsumer} from '@rails/actioncable';
+import useShoppingListsEvents from './useShoppingListEvents';
 
-const WEBSOCKET_URL = process.env.NODE_ENV === 'development' ? 'ws://localhost:3000/cable/notify' : 'wss://munchora.pro/cable/notify';
+const WEBSOCKET_URL = process.env.NODE_ENV === 'development' ? 'ws://localhost:3000/notifications/cable' : 'wss://munchora.pro/notifications/cable';
 
 export enum NotificationType {
-  GROCERY_LIST_NAME_UPDATED = 'grocery_list_shared_name_updated',
-  GROCERY_LIST_SHARED = 'grocery_list_shared',
-  GROCERY_LIST_UNSHARED = 'grocery_list_unshared',
-  GROCERY_LIST_DELETED = 'grocery_list_deleted',
-  GROCERY_ITEM_ADDED = 'grocery_item_added',
-  GROCERY_ITEM_REMOVED = 'grocery_item_removed',
-  GROCERY_ITEM_UPDATED = 'grocery_item_updated',
+  SHOPPING_LIST_NAME_UPDATED = 'shopping_list_shared_name_updated',
+  SHOPPING_LIST_SHARED = 'shopping_list_shared',
+  SHOPPING_LIST_UNSHARED = 'shopping_list_unshared',
+  SHOPPING_LIST_DELETED = 'shopping_list_deleted',
+  SHOPPING_ITEM_ADDED = 'shopping_item_added',
+  SHOPPING_ITEM_REMOVED = 'shopping_item_removed',
+  SHOPPING_ITEM_UPDATED = 'shopping_item_updated',
 }
 
 interface INotifyEvent {
@@ -25,19 +24,19 @@ const useNotifications = () => {
   const {
     handleListNameUpdated,
     handleItemAddedToList,
-    handleGroceryListDeleted,
-    handleGroceryListItemDeleted,
+    handleShoppingListDeleted,
+    handleShoppingListItemDeleted,
     handleListShared,
     handleListUnshared,
     handleItemUpdated,
-  } = useGroceryListsEvents();
+  } = useShoppingListsEvents();
 
   useEffect(() => {
     if (cable) return;
     const newCable = createConsumer(WEBSOCKET_URL);
 
     const subscription = newCable.subscriptions.create(
-      { channel: 'NotificationsChannel' },
+      {channel: 'NotificationsChannel'},
       {
         received: (data) => {
           handleNotifyEvent(data);
@@ -55,26 +54,26 @@ const useNotifications = () => {
 
   const handleNotifyEvent = (data: INotifyEvent) => {
     switch (data.type) {
-      case NotificationType.GROCERY_LIST_NAME_UPDATED:
-        handleListNameUpdated(data.payload.grocery_list_id, data.payload.updated_name);
+      case NotificationType.SHOPPING_LIST_NAME_UPDATED:
+        handleListNameUpdated(data.payload.shopping_list_id, data.payload.updated_name);
         break;
-      case NotificationType.GROCERY_LIST_SHARED:
-        handleListShared(data.payload.grocery_list);
+      case NotificationType.SHOPPING_LIST_SHARED:
+        handleListShared(data.payload.shopping_list);
         break;
-      case NotificationType.GROCERY_LIST_UNSHARED:
-        handleListUnshared(data.payload.grocery_list_id, data.payload.kicked_user_id);
+      case NotificationType.SHOPPING_LIST_UNSHARED:
+        handleListUnshared(data.payload.shopping_list_id, data.payload.kicked_user_id);
         break;
-      case NotificationType.GROCERY_LIST_DELETED:
-        handleGroceryListDeleted(data.payload.grocery_list_id);
+      case NotificationType.SHOPPING_LIST_DELETED:
+        handleShoppingListDeleted(data.payload.shopping_list_id);
         break;
-      case NotificationType.GROCERY_ITEM_ADDED:
-        handleItemAddedToList(data.payload.grocery_list_id, data.payload.item);
+      case NotificationType.SHOPPING_ITEM_ADDED:
+        handleItemAddedToList(data.payload.shopping_list_id, data.payload.item);
         break;
-      case NotificationType.GROCERY_ITEM_REMOVED:
-        handleGroceryListItemDeleted(data.payload.grocery_list_id, data.payload.removed_item_id);
+      case NotificationType.SHOPPING_ITEM_REMOVED:
+        handleShoppingListItemDeleted(data.payload.shopping_list_id, data.payload.removed_item_id);
         break;
-      case NotificationType.GROCERY_ITEM_UPDATED:
-        handleItemUpdated(data.payload.grocery_list_id, data.payload.item);
+      case NotificationType.SHOPPING_ITEM_UPDATED:
+        handleItemUpdated(data.payload.shopping_list_id, data.payload.item);
         break;
       default:
         break;

@@ -16,7 +16,7 @@ export interface IUpdateUser {
 }
 
 export interface IUser {
-    id: string;
+    id: number;
     fullname: string;
     first_name: string;
     last_name: string;

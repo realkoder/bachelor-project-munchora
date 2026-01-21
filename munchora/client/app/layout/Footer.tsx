@@ -41,8 +41,8 @@ export const Footer = () => {
               <NavLink to="/recipes" className="block text-fourth hover:text-gray-700 transition-colors">
                 Recipes
               </NavLink>
-              <NavLink to="/grocery-lists" className="block text-fourth hover:text-gray-700 transition-colors">
-                Grocery Lists
+              <NavLink to="/shopping-lists" className="block text-fourth hover:text-gray-700 transition-colors">
+                Shopping Lists
               </NavLink>
               <NavLink to="/about" className="block text-fourth hover:text-gray-700 transition-colors">
                 About

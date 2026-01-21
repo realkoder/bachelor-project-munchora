@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import useRecipes from "~/hooks/useRecipes";
 
 interface DeleteRecipeDialogProps {
-  recipeId: string;
+  recipeId: number;
 }
 
 export const DeleteRecipeDialog = ({ recipeId }: DeleteRecipeDialogProps) => {

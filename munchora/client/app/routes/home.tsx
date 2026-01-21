@@ -7,7 +7,7 @@ import { useAtomValue } from 'jotai';
 import { curUserAtom } from '~/atoms/curUserAtom';
 import { RecipesGrid } from '~/components/recipes/recipes-grid';
 import { Greeting } from '~/components/greeting/greeting';
-import useGroceryLists from '~/hooks/useGrocerylist';
+import useShoppingLists from "~/hooks/useShoppingList";
 import { recipesAtom } from '~/atoms/recipesAtom';
 import { useState } from 'react';
 import useFetchRecipes from '~/hooks/fetching/useFetchRecipes';
@@ -19,7 +19,7 @@ export function meta({}: Route.MetaArgs) {
 export default function Home() {
   const curUser = useAtomValue(curUserAtom);
   const recipes = useAtomValue(recipesAtom);
-  const { groceryLists } = useGroceryLists();
+  const { shoppingLists } = useShoppingLists();
   const [curPage, setCurPage] = useState(1);
   useFetchRecipes(curPage);
 
@@ -63,13 +63,13 @@ export default function Home() {
           </Card>
         </NavLink>
 
-        <NavLink to={'/grocery-lists'}>
+        <NavLink to={'/shopping-lists'}>
           <Card className="border backdrop-blur-sm shadow-sm hover:shadow-md transition-shadow">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs font-medium text-slate-500 uppercase tracking-wide">Lists</p>
-                  <p className="text-2xl font-light text-slate-800">{groceryLists?.length ?? 0}</p>
+                  <p className="text-2xl font-light text-slate-800">{shoppingLists?.length ?? 0}</p>
                 </div>
                 <div className="bg-emerald-100 p-2 rounded-lg">
                   <ShoppingCart className="h-4 w-4 text-emerald-600" />
@@ -181,7 +181,7 @@ export default function Home() {
           </Card>
         </NavLink>
 
-        <NavLink to="/grocery-lists">
+        <NavLink to="/shopping-lists">
           <Card className="border bg-secondary/50 hover:bg-secondary/30 transition-all duration-200 cursor-pointer">
             <CardContent className="p-6">
               <div className="flex items-center space-x-4">

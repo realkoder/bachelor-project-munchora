@@ -12,7 +12,7 @@ const useRecipes = () => {
 
     const createRecipe = async (aiPrompt: string) => {
         try {
-            const aiRecipe = await fetchRecipe('/llm/generate-recipe', {method: 'POST', data: {prompt: aiPrompt}});
+            const aiRecipe = await fetchRecipe('/recipes/api/v1/prompt-recipe', {method: 'POST', data: {prompt: aiPrompt}});
             if (!aiRecipe) {
                 toast.error('Something went wrong try again');
                 return;
@@ -85,7 +85,7 @@ const useRecipes = () => {
         }
     };
 
-    const deleteRecipe = async (recipeId: string) => {
+    const deleteRecipe = async (recipeId: number) => {
         try {
             await fetchRecipe(`/recipes/${recipeId}`, {method: 'DELETE'});
             setCurRecipe(null);

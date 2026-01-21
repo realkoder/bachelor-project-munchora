@@ -25,7 +25,7 @@ export default function Index() {
                 <span className="text-third block">Culinary Adventure</span>
               </h1>
               <p className="text-xl text-gray-600 mb-8 max-w-2xl">
-                Let AI craft personalized recipes from cuisines around the world. Organize your cooking with smart grocery lists and share culinary discoveries
+                Let AI craft personalized recipes from cuisines around the world. Organize your cooking with smart shopping lists and share culinary discoveries
                 with friends.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
@@ -103,7 +103,7 @@ export default function Index() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Everything You Need to Cook Better</h2>
-            <p className="text-xl text-gray-600">From AI-generated recipes to smart grocery planning</p>
+            <p className="text-xl text-gray-600">From AI-generated recipes to smart shopping planning</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -125,12 +125,12 @@ export default function Index() {
               </CardContent>
             </Card>
 
-            {/* Smart Grocery Lists */}
+            {/* Smart Shopping Lists */}
             <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow overflow-hidden">
               <div className="aspect-video overflow-hidden">
                 <img
-                  src="/grocery-list.jpg?height=200&width=400&text=Smart+Grocery+Shopping"
-                  alt="Organized grocery shopping with fresh ingredients"
+                  src="/shopping-list.jpg?height=200&width=400&text=Smart+Shopping+Shopping"
+                  alt="Organized shopping shopping with fresh ingredients"
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -138,8 +138,8 @@ export default function Index() {
                 <div className="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
                   <ShoppingCart className="h-8 w-8 text-green-600" />
                 </div>
-                <h3 className="text-xl font-semibold mb-4">Smart Grocery Lists</h3>
-                <p className="text-gray-600">Automatically generate shopping lists from your recipes and organize your grocery shopping efficiently.</p>
+                <h3 className="text-xl font-semibold mb-4">Smart Shopping Lists</h3>
+                <p className="text-gray-600">Automatically generate shopping lists from your recipes and organize your shopping shopping efficiently.</p>
               </CardContent>
             </Card>
 
@@ -157,7 +157,7 @@ export default function Index() {
                   <Users className="h-8 w-8 text-violet-600" />
                 </div>
                 <h3 className="text-xl font-semibold mb-4">Share & Collaborate</h3>
-                <p className="text-gray-600">Share your favorite recipes and collaborate on grocery lists with family and friends for better meal planning.</p>
+                <p className="text-gray-600">Share your favorite recipes and collaborate on shopping lists with family and friends for better meal planning.</p>
               </CardContent>
             </Card>
           </div>
@@ -279,7 +279,7 @@ export default function Index() {
               {
                 step: '3',
                 title: 'Cook & Share',
-                description: 'Follow the recipe, add it to your grocery list, and share your culinary creation with friends and family.',
+                description: 'Follow the recipe, add it to your shopping list, and share your culinary creation with friends and family.',
                 image: '/sharing-iphone.png?height=200&width=300&text=Cooking+Process',
               },
             ].map((step, index) => (

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
 import { curRecipeAtom } from '~/atoms/curRecipeAtom';
 import { curUserAtom } from '~/atoms/curUserAtom';
-import { groceryListsAtom } from '~/atoms/groceryLists';
+import { shoppingListsAtom } from '~/atoms/shoppingLists';
 import { recipesAtom } from '~/atoms/recipesAtom';
 import { useFetch } from '~/lib/api-client';
 import type { ICreateUser, ILoginResponse, IUser } from '~/types/user.interface';
@@ -18,7 +18,7 @@ const useAuth = () => {
   const navigate = useNavigate();
   const setRecipes = useSetAtom(recipesAtom);
   const setCurRecipe = useSetAtom(curRecipeAtom);
-  const setGroceries = useSetAtom(groceryListsAtom);
+  const setShoppingLists = useSetAtom(shoppingListsAtom);
 
   const createNewUser = async (user: ICreateUser) => {
     try {
@@ -62,7 +62,7 @@ const useAuth = () => {
     if (signedOutRes.message) {
       setRecipes(null);
       setCurRecipe(null);
-      setGroceries(undefined);
+      setShoppingLists(undefined);
       setCurUser(null);
       navigate('/');
     } else {

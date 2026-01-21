@@ -33,26 +33,19 @@ class ApplicationController < ActionController::API
 
   def authenticate_user!
     token = cookies[:jwt_auth]
-    # If no cookie, check for Bearer token in Authorization header
-    if token.nil?
-      auth_header = request.headers['Authorization']
-      if auth_header.present? && auth_header.start_with?('Bearer ')
-        token = auth_header.split(' ').last
-      end
-    end
 
     if token.nil?
       return render json: { error: 'Unauthorized' }, status: :unauthorized
     end
 
-    decoded = Auth::JsonWebToken.decode(token)
-    if decoded.nil? || !decoded[:user_id]
+    decoded_user = Auth::JsonWebToken.decode(token)['user']
+    if decoded_user.nil? || !decoded_user[:user_id]
       return render json: { error: 'Unauthorized' }, status: :unauthorized
     end
 
-    @current_user = User.find_by(id: decoded[:user_id])
+    @current_user = User.find_by(id: decoded_user['user_id'])
 
-    if !@current_user
+    unless @current_user
       render json: { error: 'Unauthorized' }, status: :unauthorized
     end
   rescue JWT::DecodeError, ActiveRecord::RecordNotFound
@@ -63,23 +56,16 @@ class ApplicationController < ActionController::API
     token = cookies[:jwt_auth]
 
     if token.nil?
-      auth_header = request.headers['Authorization']
-      if auth_header.present? && auth_header.start_with?('Bearer ')
-        token = auth_header.split(' ').last
-      end
-    end
-
-    if token.nil?
       @current_user = nil
       return
     end
 
-    decoded = Auth::JsonWebToken.decode(token)
-    if decoded.nil? || !decoded[:user_id]
+    decoded_user = Auth::JsonWebToken.decode(token)['user']
+    if decoded_user.nil? || !decoded_user['user_id']
       return nil
     end
 
-    @current_user = User.find_by(id: decoded[:user_id])
+    @current_user = User.find_by(id: decoded_user['user_id'])
 
   rescue JWT::DecodeError, ActiveRecord::RecordNotFound
     nil

@@ -60,7 +60,7 @@ export function loader({ params }: Route.LoaderArgs) {
   return (async () => {
     try {
       const { fetchData } = useFetch<IRecipe>();
-      const recipe = await fetchData(`/recipes/${recipeId}`);
+      const recipe = await fetchData(`/recipes/api/v1/recipes/${recipeId}`);
       return recipe;
     } catch (e) {
       return null;
@@ -80,7 +80,7 @@ export default function Recipe({ loaderData }: Route.ComponentProps) {
   useEffect(() => {
     if (!recipe && recipeId && curUser?.status === 'SIGNED_IN') {
       (async () => {
-        const recipe = await fetchData(`/recipes/${recipeId}`);
+        const recipe = await fetchData(`/recipes/api/v1/recipes/${recipeId}`);
         console.log('Recipe couldnt be rendered SSR did it CSR!', recipe);
         setRecipe(recipe);
       })();
@@ -124,7 +124,7 @@ export default function Recipe({ loaderData }: Route.ComponentProps) {
             <div className="flex flex-col md:flex-row items-center justify-between mb-6">
               <div className="flex items-center gap-3">
                 <Avatar>
-                  <AvatarImage src={recipe?.user?.image_src || '/placeholder.png'} alt={recipe?.author} />
+                  <AvatarImage src={recipe?.recipe_author?.image_src || '/placeholder.png'} alt={recipe?.author} />
                   <AvatarFallback>MR</AvatarFallback>
                 </Avatar>
                 <div>

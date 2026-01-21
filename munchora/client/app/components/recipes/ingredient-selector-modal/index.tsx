@@ -6,9 +6,10 @@ import { Badge } from '~/components/ui/badge';
 import { Input } from '~/components/ui/input';
 import { Button } from '~/components/ui/button';
 import { DialogDescription } from '@radix-ui/react-dialog';
-import useGroceryLists from '~/hooks/useGrocerylist';
+import useShoppingList from "~/hooks/useShoppingList";
 import { toast } from 'sonner';
 import type { IIngredient } from '~/types/recipe.interface';
+import useShoppingLists from "~/hooks/useShoppingList";
 
 interface IngredientSelectorModalProps {
   isOpen: boolean;
@@ -19,10 +20,10 @@ interface IngredientSelectorModalProps {
 export default function IngredientSelectorModal({ isOpen, onClose, ingredient }: IngredientSelectorModalProps) {
   const [newListName, setNewListName] = useState('');
   const [isCreatingList, setIsCreatingList] = useState(false);
-  const [addedToLists, setAddedToLists] = useState<string[]>([]);
-  const { groceryLists, addItemToList, createNewList } = useGroceryLists();
+  const [addedToLists, setAddedToLists] = useState<number[]>([]);
+  const { shoppingLists, addItemToList, createNewList } = useShoppingLists();
 
-  const handleAddToList = async (listId: string) => {
+  const handleAddToList = async (listId: number) => {
     if (!ingredient) return;
 
     setAddedToLists([...addedToLists, listId]);
@@ -54,7 +55,7 @@ export default function IngredientSelectorModal({ isOpen, onClose, ingredient }:
         <DialogHeader className="pb-4">
           <DialogTitle className="flex items-center space-x-2 text-lg sm:text-xl">
             <ShoppingCart className="h-5 w-5 text-final" />
-            <span>Add to Grocery List</span>
+            <span>Add to Shopping List</span>
           </DialogTitle>
         </DialogHeader>
 
@@ -70,7 +71,7 @@ export default function IngredientSelectorModal({ isOpen, onClose, ingredient }:
             <DialogTitle className="text-sm font-medium text-slate-700">Choose a list:</DialogTitle>
 
             <div className="space-y-2 max-h-[40vh] overflow-y-auto">
-              {groceryLists?.map((list) => (
+              {shoppingLists?.map((list) => (
                 <Card
                   key={list.id}
                   className={`cursor-pointer transition-all duration-200 hover:shadow-md active:scale-95 ${

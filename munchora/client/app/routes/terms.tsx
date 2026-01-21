@@ -60,7 +60,7 @@ export default function TermsOfServicePage() {
           <CardContent className="space-y-4">
             <p className="text-gray-600">
               Munchora provides AI-powered recipe generation, meal planning,
-              and grocery list management services. Our platform helps you
+              and shopping list management services. Our platform helps you
               discover new recipes, organize your cooking, and share culinary
               experiences.
             </p>
@@ -79,7 +79,7 @@ export default function TermsOfServicePage() {
                 </li>
                 <li className="flex items-start">
                   <div className="w-2 h-2 bg-sky-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                  <span>Smart grocery list generation and management</span>
+                  <span>Smart shopping list generation and management</span>
                 </li>
                 <li className="flex items-start">
                   <div className="w-2 h-2 bg-sky-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>

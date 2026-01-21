@@ -1,4 +1,4 @@
-import { type TCategory } from './groceryList.interface';
+import {type TCategory} from './shoppingList.interface';
 
 export interface IIngredient {
   id: number;
@@ -8,7 +8,7 @@ export interface IIngredient {
 }
 
 export interface IRecipe {
-  id: string;
+  id: number;
   title: string;
   author: string;
   image_url?: string;
@@ -22,9 +22,15 @@ export interface IRecipe {
   prep_time: number;
   cook_time: number;
   servings: number;
-  user: {
-    id: string;
+  recipe_author: {
+    auth_user_id: number;
+    bio: string;
+    created_at: Date;
+    first_name: string;
+    id: number;
     image_src: string;
+    last_name: string;
+    updated_at: Date;
   };
   created_at: Date;
   updated_at: Date;
