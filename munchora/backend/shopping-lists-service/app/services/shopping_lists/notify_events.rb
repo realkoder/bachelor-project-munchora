@@ -53,20 +53,42 @@ class ShoppingLists::NotifyEvents
   private
 
   def self.all_recipients_for_shopping_list(shopping_list)
-    user_ids = [shopping_list.owner_id] + shopping_list.shopping_list_shares.pluck(:user_id)
-    User.where(id: user_ids.uniq)
+    user_ids = [shopping_list.owner_id] + shopping_list.shopping_list_shares.pluck(:shopping_list_owner_id)
+    ShoppingListOwner.where(id: user_ids.uniq)
   end
 
   def self.broadcast(recipients, type, payload)
-    recipients.each do |user|
-      begin
-        NotificationsChannel.broadcast_to(user, {
-          type: type,
-          payload: payload
-        })
-      rescue => e
-        Rails.logger.error("Failed to notify user #{user.id}: #{e.message}")
-      end
+    begin
+      correlation_id = SecureRandom.uuid
+      response = {
+        "event_id": SecureRandom.uuid,
+        "type": type,
+        "receivers": recipients,
+        "payload": payload,
+        "created_at": DateTime.now
+      }.to_json
+
+      # Publish response back
+      RABBITMQ_CHANNEL.default_exchange.publish(
+        response,
+        routing_key: NOTIFICATION_SERVICE_QUEUE.name,
+        persistent: true,
+        content_type: 'application/json',
+        correlation_id: correlation_id
+      )
+
+    rescue => e
+      error_response = {
+        correlation_id: correlation_id,
+        status: 'failed',
+        error: e.message
+      }.to_json
+
+      RABBITMQ_CHANNEL.default_exchange.publish(
+        error_response,
+        routing_key: AI_PROMPT_RESPONSE_QUEUE.name,
+        correlation_id: correlation_id
+      )
     end
   end
 end

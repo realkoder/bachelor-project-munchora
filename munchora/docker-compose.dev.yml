@@ -179,23 +179,44 @@ services:
   # ==============================
   # NOTIFICATIONS DOMAIN
   # ==============================
-  notifications:
+  x-notifications-service: &notifications-service
+    image: notifications-service:dev
+    env_file:
+      - ./backend/notifications-service/.env.dev
+    volumes:
+      - ./backend/notifications-service:/app
+    networks:
+      - app-network
+
+  notifications-build:
+    image: notifications-service:dev
     build:
       context: ./backend/notifications-service
       dockerfile: Dockerfile.dev
+
+  notifications:
+    <<: *notifications-service
     command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -b 0.0.0.0 -p 3000"
-    env_file:
-      - ./backend/notifications-service/.env.dev
     environment:
       RAILS_ENV: development
       RAILS_RELATIVE_URL_ROOT: /notifications
-    volumes:
-      - ./backend/notifications-service:/app
     depends_on:
       rabbitmq:
         condition: service_healthy
     networks:
       - app-network
+
+  notifications-rabbitmq-consumer:
+    <<: *notifications-service
+    command: bundle exec ruby lib/rabbitmq_consumer_runner.rb
+    environment:
+      RAILS_ENV: development
+    depends_on:
+      ai-db:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+
 
   # ==============================
   # RECIPES DOMAIN
@@ -257,25 +278,43 @@ services:
   # ==============================
   # SHOPPING_LISTS DOMAIN
   # ==============================
-  shopping-lists:
+  x-shopping-lists-service: &shopping-lists-service
+    image: shopping-lists-service:dev
+    env_file:
+      - ./backend/shopping-lists-service/.env.dev
+    volumes:
+      - ./backend/shopping-lists-service:/app
+    networks:
+      - app-network
+
+  shopping-lists-build:
+    image: shopping-lists-service:dev
     build:
       context: ./backend/shopping-lists-service
       dockerfile: Dockerfile.dev
+
+  shopping-lists:
+    <<: *shopping-lists-service
     command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -b 0.0.0.0 -p 3000"
-    env_file:
-      - ./backend/shopping-lists-service/.env.dev
     environment:
       RAILS_ENV: development
       RAILS_RELATIVE_URL_ROOT: /shopping-lists
-    volumes:
-      - ./backend/shopping-lists-service:/app
     depends_on:
       rabbitmq:
         condition: service_healthy
       shopping-lists-db:
         condition: service_started
-    networks:
-      - app-network
+
+#  shopping-lists-rabbitmq-consumer:
+#    <<: *shopping-lists-service
+#    command: bundle exec rails runner lib/rabbitmq_consumer_runner.rb
+#    environment:
+#      RAILS_ENV: development
+#    depends_on:
+#      recipes-db:
+#        condition: service_started
+#      rabbitmq:
+#        condition: service_healthy
 
   shopping-lists-db:
     image: mysql:8.0
