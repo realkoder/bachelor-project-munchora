@@ -14,6 +14,7 @@ RABBITMQ_CHANNEL = RABBITMQ_CONNECTION.create_channel
 # Define queues
 AI_PROMPT_RESPONSE_QUEUE = RABBITMQ_CHANNEL.queue('ai_prompt.responses', durable: true)
 AI_PROMPT_REQUEST_QUEUE = RABBITMQ_CHANNEL.queue('ai_prompt.requests', durable: true)
+NOTIFICATION_SERVICE_QUEUE = RABBITMQ_CHANNEL.queue('notification-service', durable: true)
 
 # Graceful shutdown
 at_exit do

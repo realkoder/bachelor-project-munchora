@@ -1,7 +1,9 @@
 # app/lib/rabbitmq/ai_response_consumer.rb
 class AiResponseConsumer
+  RECIPE_CREATED = 'recipe_created'
+
   def self.start
-    puts "[RabbitMQ] AI Response consumer starting..."
+    puts '[RabbitMQ] AI Response consumer starting...'
 
     # Ensure we only take a manageable number of messages at once
     RABBITMQ_CHANNEL.prefetch(5)
@@ -49,6 +51,19 @@ class AiResponseConsumer
             category: ingredient['category']
           )
         end
+
+        recipients = [{ auth_user_id: recipe_author.id }]
+        payload = {
+          recipe: created_recipe.as_json(
+            include: {
+              ingredients: { only: [:id, :name, :category, :amount] },
+              recipe_author: {},
+              # recipe_likes: {},
+              # recipe_comments: {}
+            }
+          )
+        }
+        Prompt::RecipeNotifyEvent.broadcast(recipients, RECIPE_CREATED, payload)
 
         # Acknowledge the message if processed successfully
         RABBITMQ_CHANNEL.ack(delivery_info.delivery_tag)

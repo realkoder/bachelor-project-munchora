@@ -38,7 +38,7 @@ export interface IShoppingList {
   items: IShoppingListItem[];
   owner_id: number;
   shared_users: {
-    id: string;
+    id: number;
     first_name: string;
     image_src?: string;
   }[];

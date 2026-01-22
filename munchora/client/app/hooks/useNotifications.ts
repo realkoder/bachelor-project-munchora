@@ -1,10 +1,12 @@
 import {useEffect, useState} from 'react';
 import {Consumer, createConsumer} from '@rails/actioncable';
 import useShoppingListsEvents from './useShoppingListEvents';
+import useRecipeEvents from "~/hooks/useRecipeEvents";
 
 const WEBSOCKET_URL = process.env.NODE_ENV === 'development' ? 'ws://localhost:3000/notifications/cable' : 'wss://munchora.pro/notifications/cable';
 
 export enum NotificationType {
+  RECIPE_CREATED = 'recipe_created',
   SHOPPING_LIST_NAME_UPDATED = 'shopping_list_shared_name_updated',
   SHOPPING_LIST_SHARED = 'shopping_list_shared',
   SHOPPING_LIST_UNSHARED = 'shopping_list_unshared',
@@ -30,6 +32,7 @@ const useNotifications = () => {
     handleListUnshared,
     handleItemUpdated,
   } = useShoppingListsEvents();
+  const {handleRecipeCreated} = useRecipeEvents();
 
   useEffect(() => {
     if (cable) return;
@@ -54,6 +57,9 @@ const useNotifications = () => {
 
   const handleNotifyEvent = (data: INotifyEvent) => {
     switch (data.type) {
+      case NotificationType.RECIPE_CREATED:
+        handleRecipeCreated(data.payload.recipe);
+        break;
       case NotificationType.SHOPPING_LIST_NAME_UPDATED:
         handleListNameUpdated(data.payload.shopping_list_id, data.payload.updated_name);
         break;

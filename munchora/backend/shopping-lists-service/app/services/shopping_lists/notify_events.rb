@@ -86,7 +86,7 @@ class ShoppingLists::NotifyEvents
 
       RABBITMQ_CHANNEL.default_exchange.publish(
         error_response,
-        routing_key: AI_PROMPT_RESPONSE_QUEUE.name,
+        routing_key: NOTIFICATION_SERVICE_QUEUE.name,
         correlation_id: correlation_id
       )
     end

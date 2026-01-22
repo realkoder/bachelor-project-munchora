@@ -55,7 +55,7 @@ const useShoppingListsEvents = () => {
     });
   };
 
-  const handleListUnshared = async (listId: number, kickedUserId: string) => {
+  const handleListUnshared = async (listId: number, kickedUserId: number) => {
     if (kickedUserId === curUser?.user?.id) {
       setShoppingLists((cur) => cur?.filter((list) => list.id !== listId));
       toast.info('You got kicked from a shared list');

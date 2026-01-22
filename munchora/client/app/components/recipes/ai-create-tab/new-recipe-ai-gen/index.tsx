@@ -1,9 +1,12 @@
-import { Loader2, Sparkles, Wand2 } from 'lucide-react';
-import { Button } from '~/components/ui/button';
-import { Card, CardContent } from '~/components/ui/card';
-import { Textarea } from '~/components/ui/textarea';
+import {Loader2, Sparkles, Wand2} from 'lucide-react';
+import {Button} from '~/components/ui/button';
+import {Card, CardContent} from '~/components/ui/card';
+import {Textarea} from '~/components/ui/textarea';
 import useRecipes from '~/hooks/useRecipes';
-import { LoadingAiRecipe } from './loadingAiRecipe';
+import {LoadingAiRecipe} from './loadingAiRecipe';
+import {useEffect} from "react";
+import {useAtomValue} from "jotai";
+import {curRecipeAtom} from "~/atoms/curRecipeAtom";
 
 interface NewRecipeAIGenProps {
   aiPrompt: string;
@@ -12,16 +15,21 @@ interface NewRecipeAIGenProps {
   setIsGenerating: (cur: boolean) => void;
 }
 
-export const NewRecipeAIGen = ({ aiPrompt, setAiPrompt, isGenerating, setIsGenerating }: NewRecipeAIGenProps) => {
-  const { createRecipe } = useRecipes();
+export const NewRecipeAIGen = ({aiPrompt, setAiPrompt, isGenerating, setIsGenerating}: NewRecipeAIGenProps) => {
+  const {createRecipe} = useRecipes();
+  const curRecipe = useAtomValue(curRecipeAtom);
+
+  useEffect(() => {
+    if (curRecipe) {
+      setIsGenerating(false);
+    }
+  }, [curRecipe]);
 
   const handleAIGenerate = async () => {
     if (!aiPrompt.trim()) return;
+
     setIsGenerating(true);
-
     await createRecipe(aiPrompt);
-
-    setIsGenerating(false);
   };
 
   // const handleEditRecipe = (field: string, value: any) => {
@@ -34,17 +42,19 @@ export const NewRecipeAIGen = ({ aiPrompt, setAiPrompt, isGenerating, setIsGener
   // };
 
   return isGenerating ? (
-    <LoadingAiRecipe />
+    <LoadingAiRecipe/>
   ) : (
     <Card className="border bg-secondary/50 backdrop-blur-sm shadow-sm">
       <CardContent className="p-8">
         <div className="text-center mb-8">
-          <div className="bg-gradient-to-br from-secondary/50 to-third w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <Sparkles className="h-10 w-10 text-fourth" />
+          <div
+            className="bg-gradient-to-br from-secondary/50 to-third w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <Sparkles className="h-10 w-10 text-fourth"/>
           </div>
           <h2 className="text-2xl font-semibold text-slate-800 mb-2">Create with AI</h2>
           <p className="text-slate-600 max-w-2xl mx-auto">
-            Describe what you want to cook and let our AI create a personalized recipe for you. You can then edit and refine it to perfection.
+            Describe what you want to cook and let our AI create a personalized recipe for you. You can then edit and
+            refine it to perfection.
           </p>
         </div>
 
@@ -83,12 +93,12 @@ export const NewRecipeAIGen = ({ aiPrompt, setAiPrompt, isGenerating, setIsGener
           >
             {isGenerating ? (
               <>
-                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                <Loader2 className="mr-2 h-5 w-5 animate-spin"/>
                 Creating your recipe...
               </>
             ) : (
               <>
-                <Wand2 className="mr-2 h-5 w-5" />
+                <Wand2 className="mr-2 h-5 w-5"/>
                 Generate Recipe
               </>
             )}
