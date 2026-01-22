@@ -1,0 +1,195 @@
+name: Microservices - Continuous Integration
+
+on:
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - "munchora/backend/ai-service/**"
+      - "munchora/backend/auth-service/**"
+      - "munchora/backend/notifications-service/**"
+      - "munchora/backend/recipes-service/**"
+      - "munchora/backend/shopping-lists-service/**"
+      - ".github/workflows/services-continuous-testing.yml"
+  push:
+    branches: [ "main" ]
+    paths:
+      - "munchora/backend/ai-service/**"
+      - "munchora/backend/auth-service/**"
+      - "munchora/backend/notifications-service/**"
+      - "munchora/backend/recipes-service/**"
+      - "munchora/backend/shopping-lists-service/**"
+      - ".github/workflows/services-continuous-testing.yml"
+
+jobs:
+  # =======================================================================
+  # JOB 1: LINTING (Runs in parallel for each service)
+  # =======================================================================
+  linting:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false  # Continue testing other services even if one fails
+      matrix:
+        service:
+          - { name: 'ai', path: 'munchora/backend/ai-service' }
+          - { name: 'auth', path: 'munchora/backend/auth-service' }
+          - { name: 'notifications', path: 'munchora/backend/notifications-service' }
+          - { name: 'recipes', path: 'munchora/backend/recipes-service' }
+          - { name: 'shopping-lists', path: 'munchora/backend/shopping-lists-service' }
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.4.2
+          bundler-cache: true
+          working-directory: ${{ matrix.service.path }}
+
+      - name: Run RuboCop for ${{ matrix.service.name }}
+        working-directory: ${{ matrix.service.path }}
+        run: |
+          bundle exec rubocop \
+            --format json \
+            --out rubocop-report.json \
+            --fail-level error
+
+      - name: Upload RuboCop Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rubocop-report-${{ matrix.service.name }}
+          path: ${{ matrix.service.path }}/rubocop-report.json
+
+  # =======================================================================
+  # JOB 2: RSPEC TESTS (Runs in parallel for each service)
+  # =======================================================================
+  rspec-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+          - { name: 'ai', path: 'munchora/backend/ai-service', db: 'ai_test', port: 3307, master_key_secret: 'AI_MASTER_KEY' }
+          - { name: 'auth', path: 'munchora/backend/auth-service', db: 'auth_test', port: 3308, master_key_secret: 'AUTH_MASTER_KEY' }
+          - { name: 'notifications', path: 'munchora/backend/notifications-service', db: 'notifications_test', port: 3311, master_key_secret: 'NOTIFICATIONS_MASTER_KEY' }
+          - { name: 'recipes', path: 'munchora/backend/recipes-service', db: 'recipes_test', port: 3309, master_key_secret: 'RECIPES_MASTER_KEY' }
+          - { name: 'shopping-lists', path: 'munchora/backend/shopping-lists-service', db: 'shopping_lists_test', port: 3310, master_key_secret: 'SHOPPING_LISTS_MASTER_KEY' }
+
+#    services:
+#      mysql:
+#        image: mysql:8.0
+#        env:
+#          MYSQL_ROOT_PASSWORD: admin
+#          MYSQL_DATABASE: ${{ matrix.service.db }}
+#          MYSQL_USER: munchora
+#          MYSQL_PASSWORD: admin
+#        ports:
+#          - ${{ matrix.service.port }}:3306
+#        options: >-
+#          --health-cmd="mysqladmin ping"
+#          --health-interval=10s
+#          --health-timeout=5s
+#          --health-retries=3
+#
+#      rabbitmq:
+#        image: rabbitmq:3-management-alpine
+#        env:
+#          RABBITMQ_DEFAULT_USER: guest
+#          RABBITMQ_DEFAULT_PASS: guest
+#        ports:
+#          - 5672:5672
+#          - 15672:15672
+#        options: >-
+#          --health-cmd="rabbitmq-diagnostics check_port_connectivity"
+#          --health-interval=10s
+#          --health-timeout=5s
+#          --health-retries=10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Rails Credentials for ${{ matrix.service.name }}
+        working-directory: ${{ matrix.service.path }}
+        run: |
+          mkdir -p config
+          echo "${{ secrets[matrix.service.master_key_secret] }}" > config/master.key
+      
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.4.2
+          bundler-cache: true
+          working-directory: ${{ matrix.service.path }}
+
+      - name: Setup Database
+        working-directory: ${{ matrix.service.path }}
+        env:
+          RAILS_ENV: test
+          DATABASE_HOST: 127.0.0.1
+          DATABASE_PORT: ${{ matrix.service.port }}
+          MYSQL_USER: munchora
+          MYSQL_PASSWORD: admin
+        run: |
+          bundle exec rails db:create db:migrate RAILS_ENV=test
+
+      - name: Run RSpec Tests for ${{ matrix.service.name }}
+        working-directory: ${{ matrix.service.path }}
+        env:
+          RAILS_ENV: test
+          DATABASE_HOST: 127.0.0.1
+          DATABASE_PORT: ${{ matrix.service.port }}
+          MYSQL_USER: munchora
+          MYSQL_PASSWORD: admin
+        run: bundle exec rspec
+
+      - name: Upload Coverage Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ matrix.service.name }}
+          path: ${{ matrix.service.path }}/coverage/coverage.json
+
+  # =======================================================================
+  # JOB 3: INTEGRATION TESTS (Optional - if you have end-to-end tests)
+  # =======================================================================
+#  integration-tests:
+#    needs: [linting, rspec-tests]
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#      - uses: actions/checkout@v4
+#
+#      # Use docker-compose to spin up all services
+#      - name: Build and Start Services
+#        run: |
+#          docker-compose -f docker-compose.dev.yml up -d --build
+#
+#      - name: Wait for Services to be Ready
+#        run: |
+#          timeout 120 bash -c 'until curl -f http://localhost:3000/health; do sleep 5; done'
+#
+#      - uses: actions/setup-node@v4
+#        with:
+#          node-version: '20'
+#
+#      - name: Install Newman
+#        run: npm install -g newman newman-reporter-htmlextra
+#
+#      - name: Run Integration Tests
+#        run: |
+#          newman run your-integration-tests.json \
+#            -r cli,htmlextra \
+#            --reporter-htmlextra-export newman/integration-report.html
+#
+#      - name: Upload Test Results
+#        if: always()
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: integration-test-report
+#          path: newman/integration-report.html
+#
+#      - name: Cleanup
+#        if: always()
+#        run: docker-compose -f docker-compose.dev.yml down -v

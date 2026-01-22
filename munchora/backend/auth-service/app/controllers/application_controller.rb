@@ -39,7 +39,7 @@ class ApplicationController < ActionController::API
     end
 
     decoded_user = Auth::JsonWebToken.decode(token)['user']
-    if decoded_user.nil? || !decoded_user[:user_id]
+    if decoded_user.nil? || !decoded_user['user_id']
       return render json: { error: 'Unauthorized' }, status: :unauthorized
     end
 

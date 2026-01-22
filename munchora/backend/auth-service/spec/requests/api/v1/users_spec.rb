@@ -5,9 +5,8 @@ RSpec.describe Api::V1::UsersController, type: :request do
 
   # acting with authenticated test-user
   let!(:auth_user) { User.create!(first_name: 'Jane', last_name: 'Smith', email: 'jane@example.com', password: 'secure123') }
-  let(:headers) do
-    token = Auth::JsonWebToken.encode(user_id: auth_user.id)
-    { 'Authorization' => "Bearer #{token}", 'Content-Type' => 'application/json' }
+  let(:token) do
+    Auth::JsonWebToken.encode_user(auth_user)
   end
 
   # ======================================
@@ -21,14 +20,16 @@ RSpec.describe Api::V1::UsersController, type: :request do
       end
 
       it 'returns 200 with valid token (decision: authenticated)' do
-        get '/api/v1/users', headers: headers
+        cookies[:jwt_auth] = token
+        get '/api/v1/users'
         expect(response).to have_http_status(:ok)
       end
     end
 
     context 'without search query' do
       it 'returns all users paginated' do
-        get '/api/v1/users', headers: headers
+        cookies[:jwt_auth] = token
+        get '/api/v1/users'
 
         expect(response).to have_http_status(:ok)
         json = JSON.parse(response.body)
@@ -37,7 +38,8 @@ RSpec.describe Api::V1::UsersController, type: :request do
       end
 
       it 'returns users in correct json #fullname and without password_digest' do
-        get '/api/v1/users', headers: headers
+        cookies[:jwt_auth] = token
+        get '/api/v1/users'
 
         json = JSON.parse(response.body)
         json['data'].each do |user_json|
@@ -61,7 +63,8 @@ RSpec.describe Api::V1::UsersController, type: :request do
         { search: 'a' * 121, expect: { status: :bad_request, users_size: 0 } } # valid upper +1
       ].each do |example|
         it "returns #{example[:expect][:users_size]} users when searching with: #{example[:search]} and status: #{example[:expect][:status]}" do
-          get '/api/v1/users', params: { search: example[:search] }, headers: headers
+          cookies[:jwt_auth] = token
+          get '/api/v1/users', params: { search: example[:search] }
           expect(response).to have_http_status(example[:expect][:status])
           json = JSON.parse(response.body)
 
@@ -88,7 +91,8 @@ RSpec.describe Api::V1::UsersController, type: :request do
         { pagination: { page: 4, per_page: 2 }, expect: { users_size: 2, status: :ok } }
       ].each do |example|
         it "handles pagination with page number: #{example[:pagination][:page]} and returns #{example[:expect][:users_size]} users" do
-          get '/api/v1/users', params: { page: example[:pagination][:page], per_page: example[:pagination][:per_page] }, headers: headers
+          cookies[:jwt_auth] = token
+          get '/api/v1/users', params: { page: example[:pagination][:page], per_page: example[:pagination][:per_page] }
           expect(response).to have_http_status(example[:expect][:status])
           json = JSON.parse(response.body)
 
@@ -111,7 +115,8 @@ RSpec.describe Api::V1::UsersController, type: :request do
       end
 
       it 'returns 200 with valid token (decision: authenticated) and the users data' do
-        get "/api/v1/users/#{auth_user.id}", headers: headers
+        cookies[:jwt_auth] = token
+        get "/api/v1/users/#{auth_user.id}"
         expect(response).to have_http_status(:ok)
         user_json = JSON.parse(response.body)
         expect(user_json['fullname']).to eq("Jane Smith")
@@ -121,7 +126,8 @@ RSpec.describe Api::V1::UsersController, type: :request do
     end
 
     it 'returns the authenticated/signed-in user even if id-path-variable is incorrect' do
-      get '/api/v1/users/1212', headers: headers
+      cookies[:jwt_auth] = token
+      get '/api/v1/users/1212'
       user_json = JSON.parse(response.body)
       expect(user_json['fullname']).to eq("Jane Smith")
       expect(user_json).not_to include('password_digest')
@@ -199,9 +205,8 @@ RSpec.describe Api::V1::UsersController, type: :request do
   # ======================================
   context '#update' do
     let(:sut_user) { create(:user, first_name: 'John', last_name: 'Doe', email: 'john@example.com') }
-    let(:sut_headers) do
-      token = Auth::JsonWebToken.encode(user_id: sut_user.id)
-      { 'Authorization' => "Bearer #{token}", 'Content-Type' => 'application/json' }
+    let(:sut_token) do
+      Auth::JsonWebToken.encode_user(sut_user)
     end
 
     context 'positive tests' do
@@ -211,7 +216,8 @@ RSpec.describe Api::V1::UsersController, type: :request do
         { description: 'bio to a new bio description', attrs: { bio: 'i like cooking with ai' }, status: :ok, expect: { bio: 'i like cooking with ai' } }
       ].each do |example|
         it "updates #{example[:description]}" do
-          patch "/api/v1/users/#{sut_user.id}", params: { user: example[:attrs] }.to_json, headers: sut_headers
+          cookies[:jwt_auth] = sut_token
+          patch "/api/v1/users/#{sut_user.id}", headers: { 'Content-Type' => 'application/json' }, params: { user: example[:attrs] }.to_json
 
           expect(response).to have_http_status(example[:status])
           if example[:expect] != nil
@@ -228,7 +234,8 @@ RSpec.describe Api::V1::UsersController, type: :request do
       it 'returns 422 when required fields are blank' do
         updated_attributes = { first_name: '', last_name: '' }
 
-        patch "/api/v1/users/#{sut_user.id}", params: { user: updated_attributes }.to_json, headers: sut_headers
+        cookies[:jwt_auth] = sut_token
+        patch "/api/v1/users/#{sut_user.id}", headers: { 'Content-Type' => 'application/json' }, params: { user: updated_attributes }.to_json
 
         expect(response).to have_http_status(:unprocessable_content)
       end
