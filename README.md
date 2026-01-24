@@ -213,3 +213,48 @@ bundle exec rubocop
 # Run analyzer and make rubocop automatically fix linting issues
 bundle exec rubocop -a
 ```
+
+<br>
+
+# K8s / Kubernetes / Kubectl
+
+Relevant kubectl commands:
+
+```bash
+# Check kubernetes cluster status
+kubectl cluster-info
+
+# Check nodes status
+kubectl get nodes
+
+# Check pods status
+kubectl get pods --all-namespaces
+
+# Get applied deployments
+kubectl get deployments
+
+# Create a namespace for
+kubectl create namespace antik-moderne
+
+# Creatig the configmap  based on .env.production
+kubectl create configmap frontend-env --from-env-file=frontend/.env.production
+
+# Verify the secrets stored in a configmap
+kubectl describe configmap frontend-env
+
+# Apply deployment and service files
+kubectl apply -f k8s/frontend/deployment.yml
+kubectl apply -f k8s/frontend/service.yml
+
+# Describe a pod
+kubectl describe pod <pod_name>
+
+# Remove an applied deployment
+kubectl delete deployment <deployment-name>
+
+# Delete pods in this case encore-app
+kubectl delete pods -l app=encore-app
+
+# Kubectl interact with postgresql db
+kubectl exec -it <pod_name> -- psql -U postgres
+```
