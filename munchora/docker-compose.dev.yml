@@ -103,7 +103,7 @@ services:
 
   ai-rabbitmq-consumer:
     <<: *ai-service
-    command: bundle exec ruby lib/rabbitmq_consumer_runner.rb
+    command: bundle exec ruby bin/rabbitmq_consumer_runner.rb
     environment:
       RAILS_ENV: development
     depends_on:

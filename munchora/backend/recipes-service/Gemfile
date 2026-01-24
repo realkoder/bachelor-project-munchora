@@ -4,6 +4,10 @@ source "https://rubygems.org"
 gem "rails", "~> 8.0.4"
 # Use mysql as the database for Active Record
 gem "mysql2", "~> 0.5"
+
+# Using sqlite3 for testing
+gem 'sqlite3', '~> 2.9', group: :test
+
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
@@ -56,4 +60,14 @@ group :development, :test do
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
+
+  # Test coverage tracking tool
+  gem 'simplecov', '~> 0.22.0', require: false
+
+  # Rspec for TDD
+  gem 'rspec-rails', '~> 8.0.2'
+  gem 'factory_bot_rails', '~> 6.5.1'
+  gem 'faker', '~> 3.5.2'
+  gem 'webmock', '~> 3.26.1'
+  gem 'shoulda-matchers', '~> 5.0'
 end

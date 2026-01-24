@@ -124,6 +124,7 @@ jobs:
           working-directory: ${{ matrix.service.path }}
 
       - name: Setup Database
+        if: ${{ matrix.service.name != 'notifications' }}
         working-directory: ${{ matrix.service.path }}
         env:
           RAILS_ENV: test
