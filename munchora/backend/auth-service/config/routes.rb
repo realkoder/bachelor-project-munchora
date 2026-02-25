@@ -1,12 +1,4 @@
 Rails.application.routes.draw do
-  get "users/index"
-  get "users/show"
-  get "users/create"
-  get "users/update"
-  get "users/destroy"
-  get "users/search"
-  get "users/upload_image"
-  get "users/delete_image"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   scope Rails.application.config.relative_url_root.presence || '/' do

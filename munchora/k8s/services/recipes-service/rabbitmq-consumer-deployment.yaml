@@ -1,0 +1,120 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recipes-rabbitmq-consumer
+  labels:
+    app: recipes-service
+    component: consumer
+    app.kubernetes.io/name: recipes-service
+    app.kubernetes.io/part-of: munchora
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: recipes-service
+      component: consumer
+  template:
+    metadata:
+      labels:
+        app: recipes-service
+        component: consumer
+    spec:
+      initContainers:
+        - name: wait-for-mysql
+          image: busybox:1.35
+          command:
+            - sh
+            - -c
+            - |
+              until nc -z recipes-mysql-service 3306; do
+                echo "Waiting for MySQL..."
+                sleep 2
+              done
+              echo "MySQL is ready!"
+        - name: wait-for-rabbitmq
+          image: busybox:1.35
+          command:
+            - sh
+            - -c
+            - |
+              until nc -z rabbitmq-service 5672; do
+                echo "Waiting for RabbitMQ..."
+                sleep 2
+              done
+              echo "RabbitMQ is ready!"
+      containers:
+        - name: recipes-consumer
+          image: munchora-recipes-service:latest
+          imagePullPolicy: Never
+          command:
+            - bundle
+            - exec
+            - rails
+            - runner
+            - lib/rabbitmq_consumer_runner.rb
+          env:
+            # Rails configuration
+            - name: RAILS_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: munchora-config
+                  key: RAILS_ENV
+
+            # Database configuration
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: recipes-service-config
+                  key: DB_HOST
+            - name: MYSQL_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: recipes-service-config
+                  key: MYSQL_PORT
+            - name: MYSQL_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: recipes-service-config
+                  key: MYSQL_USER
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-credentials
+                  key: MYSQL_PASSWORD
+
+            # RabbitMQ configuration
+            - name: RABBITMQ_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: munchora-config
+                  key: RABBITMQ_HOST
+            - name: RABBITMQ_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: munchora-config
+                  key: RABBITMQ_PORT
+            - name: RABBITMQ_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: munchora-config
+                  key: RABBITMQ_USER
+            - name: RABBITMQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-credentials
+                  key: RABBITMQ_PASSWORD
+
+            # Rails master key
+            - name: RAILS_MASTER_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: recipes-service-master-key
+                  key: RAILS_MASTER_KEY
+
+          resources:
+            requests:
+              memory: '256Mi'
+              cpu: '100m'
+            limits:
+              memory: '512Mi'
+              cpu: '250m'

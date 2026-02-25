@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: shopping-lists-service
+  labels:
+    app: shopping-lists-service
+    app.kubernetes.io/name: shopping-lists-service
+    app.kubernetes.io/part-of: munchora
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3000
+      targetPort: 3000
+      protocol: TCP
+  selector:
+    app: shopping-lists-service
+    component: server

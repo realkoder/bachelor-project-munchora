@@ -1,0 +1,150 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recipes-service
+  labels:
+    app: recipes-service
+    component: server
+    app.kubernetes.io/name: recipes-service
+    app.kubernetes.io/part-of: munchora
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: recipes-service
+      component: server
+  template:
+    metadata:
+      labels:
+        app: recipes-service
+        component: server
+    spec:
+      initContainers:
+        - name: wait-for-mysql
+          image: busybox:1.35
+          command:
+            - sh
+            - -c
+            - |
+              until nc -z recipes-mysql-service 3306; do
+                echo "Waiting for MySQL..."
+                sleep 2
+              done
+              echo "MySQL is ready!"
+        - name: wait-for-rabbitmq
+          image: busybox:1.35
+          command:
+            - sh
+            - -c
+            - |
+              until nc -z rabbitmq-service 5672; do
+                echo "Waiting for RabbitMQ..."
+                sleep 2
+              done
+              echo "RabbitMQ is ready!"
+      containers:
+        - name: recipes-service
+          # Build this image locally: eval $(minikube docker-env) && docker build -t munchora-recipes-service:latest -f Dockerfile.dev .
+          image: munchora-recipes-service:latest
+          imagePullPolicy: Never
+          command:
+            - bash
+            - -c
+            - rm -f tmp/pids/server.pid && bundle exec rails s -b 0.0.0.0 -p 3000
+          ports:
+            - containerPort: 3000
+              name: http
+          env:
+            # Rails configuration
+            - name: RAILS_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: munchora-config
+                  key: RAILS_ENV
+            - name: RAILS_LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: munchora-config
+                  key: RAILS_LOG_LEVEL
+            - name: RAILS_RELATIVE_URL_ROOT
+              valueFrom:
+                configMapKeyRef:
+                  name: recipes-service-config
+                  key: RAILS_RELATIVE_URL_ROOT
+
+            # Database configuration
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: recipes-service-config
+                  key: DB_HOST
+            - name: MYSQL_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: recipes-service-config
+                  key: MYSQL_PORT
+            - name: MYSQL_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: recipes-service-config
+                  key: MYSQL_USER
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-credentials
+                  key: MYSQL_PASSWORD
+
+            # RabbitMQ configuration
+            - name: RABBITMQ_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: munchora-config
+                  key: RABBITMQ_HOST
+            - name: RABBITMQ_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: munchora-config
+                  key: RABBITMQ_PORT
+            - name: RABBITMQ_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: munchora-config
+                  key: RABBITMQ_USER
+            - name: RABBITMQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-credentials
+                  key: RABBITMQ_PASSWORD
+
+            # Rails master key
+            - name: RAILS_MASTER_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: recipes-service-master-key
+                  key: RAILS_MASTER_KEY
+
+          livenessProbe:
+            httpGet:
+              path: /recipes/up
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          readinessProbe:
+            httpGet:
+              path: /recipes/up
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+
+          resources:
+            requests:
+              memory: '256Mi'
+              cpu: '100m'
+            limits:
+              memory: '512Mi'
+              cpu: '500m'

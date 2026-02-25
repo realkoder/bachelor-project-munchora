@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: munchora-config
+  labels:
+    app.kubernetes.io/part-of: munchora
+data:
+  RAILS_ENV: 'development'
+  RAILS_LOG_LEVEL: 'debug'
+  RABBITMQ_HOST: 'rabbitmq-service'
+  RABBITMQ_PORT: '5672'
+  RABBITMQ_USER: 'guest'

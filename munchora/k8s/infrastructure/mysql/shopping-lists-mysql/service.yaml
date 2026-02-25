@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: shopping-lists-mysql-service
+  labels:
+    app: shopping-lists-mysql
+    app.kubernetes.io/name: shopping-lists-mysql
+    app.kubernetes.io/part-of: munchora
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3306
+      targetPort: 3306
+      protocol: TCP
+  selector:
+    app: shopping-lists-mysql

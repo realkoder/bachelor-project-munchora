@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notifications-rabbitmq-consumer
+  labels:
+    app: notifications-service
+    component: consumer
+    app.kubernetes.io/name: notifications-service
+    app.kubernetes.io/part-of: munchora
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notifications-service
+      component: consumer
+  template:
+    metadata:
+      labels:
+        app: notifications-service
+        component: consumer
+    spec:
+      initContainers:
+        - name: wait-for-rabbitmq
+          image: busybox:1.35
+          command:
+            - sh
+            - -c
+            - |
+              until nc -z rabbitmq-service 5672; do
+                echo "Waiting for RabbitMQ..."
+                sleep 2
+              done
+              echo "RabbitMQ is ready!"
+      containers:
+        - name: notifications-consumer
+          image: munchora-notifications-service:latest
+          imagePullPolicy: Never
+          command:
+            - bundle
+            - exec
+            - ruby
+            - lib/rabbitmq_consumer_runner.rb
+          env:
+            # Rails configuration
+            - name: RAILS_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: munchora-config
+                  key: RAILS_ENV
+
+            # RabbitMQ configuration
+            - name: RABBITMQ_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: munchora-config
+                  key: RABBITMQ_HOST
+            - name: RABBITMQ_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: munchora-config
+                  key: RABBITMQ_PORT
+            - name: RABBITMQ_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: munchora-config
+                  key: RABBITMQ_USER
+            - name: RABBITMQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: rabbitmq-credentials
+                  key: RABBITMQ_PASSWORD
+
+            # Rails master key
+            - name: RAILS_MASTER_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: notifications-service-master-key
+                  key: RAILS_MASTER_KEY
+
+            # Resend API key (optional)
+            - name: RESEND_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: resend-api
+                  key: RESEND_API_KEY
+                  optional: true
+
+          resources:
+            requests:
+              memory: '256Mi'
+              cpu: '100m'
+            limits:
+              memory: '512Mi'
+              cpu: '250m'

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: recipes-service-config
+  labels:
+    app.kubernetes.io/name: recipes-service
+    app.kubernetes.io/part-of: munchora
+data:
+  RAILS_RELATIVE_URL_ROOT: '/recipes'
+  DB_HOST: 'recipes-mysql-service'
+  MYSQL_PORT: '3306'
+  MYSQL_USER: 'munchora'

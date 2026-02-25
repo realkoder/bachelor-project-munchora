@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ai-service-config
+  labels:
+    app.kubernetes.io/name: ai-service
+    app.kubernetes.io/part-of: munchora
+data:
+  RAILS_RELATIVE_URL_ROOT: '/ai'
+  DB_HOST: 'ai-mysql-service'
+  MYSQL_PORT: '3306'
+  MYSQL_USER: 'munchora'

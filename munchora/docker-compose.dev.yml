@@ -217,7 +217,6 @@ services:
       rabbitmq:
         condition: service_healthy
 
-
   # ==============================
   # RECIPES DOMAIN
   # ==============================
