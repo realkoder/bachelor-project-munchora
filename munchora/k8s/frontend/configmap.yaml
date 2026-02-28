@@ -3,12 +3,12 @@ kind: ConfigMap
 metadata:
   name: frontend-config
   labels:
-    app.kubernetes.io/name: frontend
+    app.kubernetes.io/name: frontend-app
     app.kubernetes.io/part-of: munchora
 data:
-  NODE_ENV: 'production'
+  NODE_ENV: 'development'
   VITE_ENV: 'development'
   # External API URL (accessed from browser)
-  VITE_BASE_URL: 'http://munchora.local/api/v1'
+  VITE_BASE_URL: 'http://localhost'
   # Internal API URL (accessed from SSR server)
-  VITE_BASE_URL_SSR: 'http://nginx-service/api/v1'
+  VITE_BASE_URL_SSR: 'http://ingress-nginx-controller.ingress-nginx'

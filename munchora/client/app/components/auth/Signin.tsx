@@ -1,11 +1,11 @@
-import { NavLink } from 'react-router';
-import { Input } from '../ui/input';
-import { useState } from 'react';
+import {NavLink} from 'react-router';
+import {Input} from '../ui/input';
+import {useState} from 'react';
 import useAuth from '~/hooks/useAuth';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Label } from '../ui/label';
-import { Button } from '../ui/button';
-import { Eye, EyeOff } from 'lucide-react';
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '../ui/card';
+import {Label} from '../ui/label';
+import {Button} from '../ui/button';
+import {Eye, EyeOff} from 'lucide-react';
 import GoogleButton from 'react-google-signin-button';
 import 'react-google-signin-button/dist/button.css';
 
@@ -15,7 +15,7 @@ export const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
   const credentialsProvided = password.length > 5 && email.length > 5;
   const [isLoading, setIsLoading] = useState(false);
-  const { loginUser } = useAuth();
+  const {loginUser} = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,10 +32,10 @@ export const SignIn = () => {
         <CardDescription className="flex flex-col items-center gap-4">
           Sign in to your account to continue cooking
           <a
-            href={import.meta.env.VITE_ENV !== 'production' ? 'http://localhost:3000/auth/api/v1/auth/google' : 'https://munchora.pro/api/v1/auth/google'}
+            href={import.meta.env.VITE_ENV !== 'production' ? (import.meta.env.VITE_BASE_URL ? `${import.meta.env.VITE_BASE_URL}/auth-app/api/v1/auth/google` : 'http://localhost:3000/auth/api/v1/auth/google') : 'https://munchora.pro/api/v1/auth/google'}
             className="btn"
           >
-            <GoogleButton />
+            <GoogleButton/>
           </a>
         </CardDescription>
       </CardHeader>
@@ -75,7 +75,7 @@ export const SignIn = () => {
                 className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                 onClick={() => setShowPassword(!showPassword)}
               >
-                {showPassword ? <EyeOff className="h-4 w-4 text-gray-400" /> : <Eye className="h-4 w-4 text-gray-400" />}
+                {showPassword ? <EyeOff className="h-4 w-4 text-gray-400"/> : <Eye className="h-4 w-4 text-gray-400"/>}
               </Button>
             </div>
           </div>
@@ -88,7 +88,8 @@ export const SignIn = () => {
 
           <div className="text-xs text-gray-600 bg-secondary/50 p-3 rounded-lg mb-4">
             <p>
-              By signing in, you agree to our use of cookies to enhance your experience and remember your preferences.{' '}
+              By signing in, you agree to our use of cookies to enhance your experience and remember your
+              preferences.{' '}
               <NavLink to="/privacy" className="text-fourth hover:text-fourth/80 underline">
                 Learn more
               </NavLink>

@@ -1,7 +1,169 @@
+---
+# Auth Service: /auth-app/* -> /auth/*
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: local-gateway
+  name: local-gateway-auth
+  labels:
+    app.kubernetes.io/name: api-gateway
+    app.kubernetes.io/part-of: munchora
+    app.kubernetes.io/component: ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /auth/$2
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "86400"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/use-forwarded-headers: "true"
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: localhost
+      http:
+        paths:
+          - path: /auth-app(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: auth-service
+                port:
+                  number: 3000
+
+---
+# Recipes Service: /recipes-app/* -> /recipes/*
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: local-gateway-recipes
+  labels:
+    app.kubernetes.io/name: api-gateway
+    app.kubernetes.io/part-of: munchora
+    app.kubernetes.io/component: ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /recipes/$2
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "86400"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/use-forwarded-headers: "true"
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: localhost
+      http:
+        paths:
+          - path: /recipes-app(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: recipes-service
+                port:
+                  number: 3000
+
+---
+# Shopping Lists Service: /shopping-lists-app/* -> /shopping-lists/*
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: local-gateway-shopping-lists
+  labels:
+    app.kubernetes.io/name: api-gateway
+    app.kubernetes.io/part-of: munchora
+    app.kubernetes.io/component: ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /shopping-lists/$2
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "86400"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/use-forwarded-headers: "true"
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: localhost
+      http:
+        paths:
+          - path: /shopping-lists-app(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: shopping-lists-service
+                port:
+                  number: 3000
+
+---
+# AI Service: /ai-app/* -> /ai/*
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: local-gateway-ai
+  labels:
+    app.kubernetes.io/name: api-gateway
+    app.kubernetes.io/part-of: munchora
+    app.kubernetes.io/component: ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /ai/$2
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "86400"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/use-forwarded-headers: "true"
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: localhost
+      http:
+        paths:
+          - path: /ai-app(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: ai-service
+                port:
+                  number: 3000
+
+---
+# Notifications Service: /notifications-app/* -> /notifications/*
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: local-gateway-notifications
+  labels:
+    app.kubernetes.io/name: api-gateway
+    app.kubernetes.io/part-of: munchora
+    app.kubernetes.io/component: ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /notifications/$2
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "86400"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/use-forwarded-headers: "true"
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: localhost
+      http:
+        paths:
+          - path: /notifications-app(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: notifications-service
+                port:
+                  number: 3000
+
+---
+# Frontend - no rewrite needed
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: local-gateway-frontend
   labels:
     app.kubernetes.io/name: api-gateway
     app.kubernetes.io/part-of: munchora
@@ -9,52 +171,20 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/proxy-connect-timeout: "300"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "86400"
     nginx.ingress.kubernetes.io/proxy-body-size: "50m"
     nginx.ingress.kubernetes.io/use-forwarded-headers: "true"
-    nginx.ingress.kubernetes.io/websocket-services: "notifications-service"
+    nginx.ingress.kubernetes.io/proxy-buffering: "off"
 spec:
   ingressClassName: nginx
   rules:
     - host: localhost
       http:
         paths:
-          - path: /auth
+          - path: /
             pathType: Prefix
             backend:
               service:
-                name: auth-service
+                name: frontend-app
                 port:
-                  number: 3000
-
-          - path: /recipes
-            pathType: Prefix
-            backend:
-              service:
-                name: recipes-service
-                port:
-                  number: 3000
-
-          - path: /shopping-lists
-            pathType: Prefix
-            backend:
-              service:
-                name: shopping-lists-service
-                port:
-                  number: 3000
-
-          - path: /ai
-            pathType: Prefix
-            backend:
-              service:
-                name: ai-service
-                port:
-                  number: 3000
-
-          - path: /notifications
-            pathType: Prefix
-            backend:
-              service:
-                name: notifications-service
-                port:
-                  number: 3000
+                  number: 5173

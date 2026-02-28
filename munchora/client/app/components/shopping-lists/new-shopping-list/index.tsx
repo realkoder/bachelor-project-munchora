@@ -2,7 +2,8 @@ import { Plus } from "lucide-react";
 import { useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import useShoppingLists from "~/hooks/useShoppinglist";
+import useShoppingLists from "~/hooks/useShoppingList";
+
 
 export const NewShoppingList = () => {
   const { createNewList } = useShoppingLists();

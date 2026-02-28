@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: frontend
+  name: frontend-app
   labels:
-    app: frontend
-    app.kubernetes.io/name: frontend
+    app: frontend-app
+    app.kubernetes.io/name: frontend-app
     app.kubernetes.io/part-of: munchora
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: frontend
+      app: frontend-app
   template:
     metadata:
       labels:
-        app: frontend
+        app: frontend-app
     spec:
       containers:
-        - name: frontend
+        - name: frontend-app
           # Build this image locally: eval $(minikube docker-env) && docker build -t munchora-frontend -f Dockerfile.dev .
           image: munchora-frontend:latest
           imagePullPolicy: Never

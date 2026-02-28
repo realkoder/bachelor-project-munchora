@@ -60,7 +60,7 @@ export function loader({ params }: Route.LoaderArgs) {
   return (async () => {
     try {
       const { fetchData } = useFetch<IRecipe>();
-      const recipe = await fetchData(`/recipes/api/v1/recipes/${recipeId}`);
+      const recipe = await fetchData(`/recipes-app/api/v1/recipes/${recipeId}`);
       return recipe;
     } catch (e) {
       return null;
@@ -80,7 +80,7 @@ export default function Recipe({ loaderData }: Route.ComponentProps) {
   useEffect(() => {
     if (!recipe && recipeId && curUser?.status === 'SIGNED_IN') {
       (async () => {
-        const recipe = await fetchData(`/recipes/api/v1/recipes/${recipeId}`);
+        const recipe = await fetchData(`/recipes-app/api/v1/recipes/${recipeId}`);
         console.log('Recipe couldnt be rendered SSR did it CSR!', recipe);
         setRecipe(recipe);
       })();

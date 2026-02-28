@@ -5,7 +5,7 @@ import type { IShoppingList } from '~/types/shoppingList.interface';
 import { useApiGetQuery } from './useApiGetQuery';
 
 const useFetchShoppingLists = () => {
-  const { data, isLoading } = useApiGetQuery<IShoppingList[]>(['shoppingLists'], '/shopping-lists/api/v1/shopping_lists', true);
+  const { data, isLoading } = useApiGetQuery<IShoppingList[]>(['shoppingLists'], '/shopping-lists-app/api/v1/shopping_lists', true);
   const setShoppingLists = useSetAtom(shoppingListsAtom);
 
   useEffect(() => {

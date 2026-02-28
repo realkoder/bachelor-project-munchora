@@ -12,7 +12,7 @@ const useRecipes = () => {
 
     const createRecipe = async (aiPrompt: string) => {
         try {
-            await fetchRecipe('/recipes/api/v1/prompt-recipe', {method: 'POST', data: {prompt: aiPrompt}});
+            await fetchRecipe('/recipes-app/api/v1/prompt-recipe', {method: 'POST', data: {prompt: aiPrompt}});
         } catch {
             toast.error('Something went wrong try again');
         }

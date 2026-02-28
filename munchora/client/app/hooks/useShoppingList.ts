@@ -17,7 +17,7 @@ const useShoppingLists = () => {
     if (!name.trim() || name.length > 50) return;
 
     try {
-      await fetchShoppingList(`/shopping-lists/api/v1/shopping_lists/${listId}`, { method: 'PUT', data: { shopping_list: { name } } });
+      await fetchShoppingList(`/shopping-lists-app/api/v1/shopping_lists/${listId}`, { method: 'PUT', data: { shopping_list: { name } } });
     } catch {
       toast.error('Something went wrong updating the name of your list - check your connection, try reload!');
     }
@@ -27,7 +27,7 @@ const useShoppingLists = () => {
     if (!listId || !name.trim() || name.length > 50) return;
     setIsAddingItem(true);
     try {
-      await fetchShoppingListItem(`/shopping-lists/api/v1/shopping_lists/${listId}/add-item`, {
+      await fetchShoppingListItem(`/shopping-lists-app/api/v1/shopping_lists/${listId}/add-item`, {
         method: 'POST',
         data: { item: { name, category } },
       });
@@ -41,7 +41,7 @@ const useShoppingLists = () => {
     if (!newListName.trim() || newListName.length > 50) return;
 
     try {
-      const response = await fetchShoppingList('/shopping-lists/api/v1/shopping_lists/', {
+      const response = await fetchShoppingList('/shopping-lists-app/api/v1/shopping_lists/', {
         method: 'POST',
         data: { shopping_list: { name: newListName } },
       });
@@ -56,7 +56,7 @@ const useShoppingLists = () => {
 
   const deleteShoppingList = async (listId: number) => {
     try {
-      await fetchData(`/shopping-lists/api/v1/shopping_lists/${listId}`, { method: 'DELETE' });
+      await fetchData(`/shopping-lists-app/api/v1/shopping_lists/${listId}`, { method: 'DELETE' });
     } catch {
       toast.error('Something went wrong deleting list. Check your connection.');
     }
@@ -65,7 +65,7 @@ const useShoppingLists = () => {
   const deleteShoppingListItem = async (listId: number | undefined, itemId: number) => {
     if (!listId) return;
     try {
-      await fetchShoppingList(`/shopping-lists/api/v1/shopping_lists/${listId}/remove-item/${itemId}`, { method: 'DELETE' });
+      await fetchShoppingList(`/shopping-lists-app/api/v1/shopping_lists/${listId}/remove-item/${itemId}`, { method: 'DELETE' });
     } catch {
       toast.error('Something went wrong removing your item - try to reload');
     }
@@ -81,7 +81,7 @@ const useShoppingLists = () => {
     }
   };
 
-  const unShareList = async (listId: number, selectedUserId: string) => {
+  const unShareList = async (listId: number, selectedUserId: number) => {
     try {
       await fetchShoppingList(`/shopping_lists/${listId}/unshare`, {
         method: 'DELETE',
@@ -96,7 +96,7 @@ const useShoppingLists = () => {
   const toggleItemCompleted = async (listId: number | undefined, itemId: number, is_completed: boolean) => {
     if (!listId) return;
     try {
-      await fetchShoppingList(`/shopping-lists/api/v1/shopping_lists/${listId}/update-item/${itemId}`, {
+      await fetchShoppingList(`/shopping-lists-app/api/v1/shopping_lists/${listId}/update-item/${itemId}`, {
         method: 'PATCH',
         data: { is_completed: !is_completed },
       });
@@ -107,7 +107,7 @@ const useShoppingLists = () => {
 
   const updateItem = async (listId: number, itemId: number, name: string, category: TCategory) => {
     try {
-      await fetchShoppingList(`/shopping-lists/api/v1/shopping_lists/${listId}/update-item/${itemId}`, {
+      await fetchShoppingList(`/shopping-lists-app/api/v1/shopping_lists/${listId}/update-item/${itemId}`, {
         method: 'PATCH',
         data: { name, category },
       });

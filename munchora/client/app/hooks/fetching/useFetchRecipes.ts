@@ -9,7 +9,7 @@ const useFetchRecipes = (page: number, filters?: IFilters) => {
   const setRecipes = useSetAtom(recipesAtom);
   const [pagination, setPagination] = useState<IPaginationMeta>();
 
-  const { data, isLoading, error, refetch } = usePaginatedQuery<IRecipe[]>('/recipes/api/v1/recipes', page, 9, 'recipes', filters);
+  const { data, isLoading, error, refetch } = usePaginatedQuery<IRecipe[]>('/recipes-app/api/v1/recipes', page, 9, 'recipes', filters);
 
   useEffect(() => {
     if (data?.data) {

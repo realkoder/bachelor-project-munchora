@@ -1,22 +1,22 @@
-import { Button } from '~/components/ui/button';
-import { ArrowLeft, Calendar, CheckCircle2, Circle, Edit2, Pencil, Plus, Trash2, User, Users } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
-import { Badge } from '~/components/ui/badge';
-import { useEffect, useState } from 'react';
-import { useAtom } from 'jotai';
-import { useNavigate, useParams } from 'react-router';
-import { CATEGORIES, type TCategory } from '~/types/shoppingList.interface';
-import { curShoppingListAtom } from '~/atoms/curShoppingList';
-import useShoppingLists from '~/hooks/useShoppinglist';
-import { Input } from '~/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
-import { DeleteListItem } from '~/components/shopping-lists/shopping-list/delete-list-item';
-import { UpdateListItemModal } from '~/components/shopping-lists/shopping-list/update-list-item-modal';
-import { Checkbox } from '~/components/ui/checkbox';
+import {Button} from '~/components/ui/button';
+import {ArrowLeft, Calendar, CheckCircle2, Circle, Edit2, Pencil, Plus, Trash2, User, Users} from 'lucide-react';
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '~/components/ui/card';
+import {Badge} from '~/components/ui/badge';
+import {useEffect, useState} from 'react';
+import {useAtom} from 'jotai';
+import {useNavigate, useParams} from 'react-router';
+import {CATEGORIES, type TCategory} from '~/types/shoppingList.interface';
+import {curShoppingListAtom} from '~/atoms/curShoppingList';
+import {Input} from '~/components/ui/input';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '~/components/ui/select';
+import {DeleteListItem} from '~/components/shopping-lists/shopping-list/delete-list-item';
+import {UpdateListItemModal} from '~/components/shopping-lists/shopping-list/update-list-item-modal';
+import {Checkbox} from '~/components/ui/checkbox';
+import useShoppingLists from "~/hooks/useShoppingList";
 
 export function meta() {
   [
-    { title: 'Shopping List | Munchora' },
+    {title: 'Shopping List | Munchora'},
     {
       name: 'Shopping List | Munchora',
       content: 'Discover delicious recipes on Munchora!',
@@ -28,7 +28,15 @@ export default function ShoppingListDetail() {
   const params = useParams();
   const listId = Number(params.listId);
   const [curShoppingList, setCurShoppingList] = useAtom(curShoppingListAtom);
-  const { addItemToList, deleteShoppingList, deleteShoppingListItem, shoppingLists, toggleItemCompleted, isAddingItem, updateItem } = useShoppingLists();
+  const {
+    addItemToList,
+    deleteShoppingList,
+    deleteShoppingListItem,
+    shoppingLists,
+    toggleItemCompleted,
+    isAddingItem,
+    updateItem
+  } = useShoppingLists();
   const [isEditing, setIsEditing] = useState(false);
   const [newItemName, setNewItemName] = useState('');
   const [newItemCategory, setNewItemCategory] = useState<TCategory>('no category 📦');
@@ -65,7 +73,7 @@ export default function ShoppingListDetail() {
         {/* Header */}
         <div className="mb-8">
           <Button variant="ghost" onClick={() => navigate('/shopping-lists')} className="mb-4">
-            <ArrowLeft className="w-4 h-4 mr-2" />
+            <ArrowLeft className="w-4 h-4 mr-2"/>
             Back to Lists
           </Button>
 
@@ -73,7 +81,8 @@ export default function ShoppingListDetail() {
             <div className="flex-1">
               {isEditing ? (
                 <div className="space-y-4 max-w-md">
-                  <Input value={editName} onChange={(e) => setEditName(e.target.value)} className="text-2xl font-bold" placeholder="List name" />
+                  <Input value={editName} onChange={(e) => setEditName(e.target.value)} className="text-2xl font-bold"
+                         placeholder="List name"/>
                   <div className="flex space-x-2">
                     <Button onClick={() => console.log('IMPLEMENT ME')} size="sm">
                       Save
@@ -93,18 +102,18 @@ export default function ShoppingListDetail() {
                     >
                       {curShoppingList && curShoppingList.shared_users.length > 0 ? (
                         <>
-                          <Users className="w-3 h-3 mr-1" /> Shared
+                          <Users className="w-3 h-3 mr-1"/> Shared
                         </>
                       ) : (
                         <>
-                          <User className="w-3 h-3 mr-1" /> Personal
+                          <User className="w-3 h-3 mr-1"/> Personal
                         </>
                       )}
                     </Badge>
                   </div>
                   <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                     <span className="flex items-center">
-                      <Calendar className="w-4 h-4 mr-1" />
+                      <Calendar className="w-4 h-4 mr-1"/>
                       Created {curShoppingList?.created_at && new Date(curShoppingList?.created_at).toDateString()}
                     </span>
                   </div>
@@ -113,7 +122,7 @@ export default function ShoppingListDetail() {
             </div>
             {!isEditing && (
               <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
-                <Edit2 className="w-4 h-4 mr-2" />
+                <Edit2 className="w-4 h-4 mr-2"/>
                 Edit
               </Button>
             )}
@@ -124,7 +133,7 @@ export default function ShoppingListDetail() {
         <Card className="mb-4">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <Plus className="w-5 h-5 text-primary" />
+              <Plus className="w-5 h-5 text-primary"/>
               <span>Add New Item</span>
             </CardTitle>
           </CardHeader>
@@ -148,7 +157,7 @@ export default function ShoppingListDetail() {
               <div>
                 <Select value={newItemCategory} onValueChange={(val: TCategory) => setNewItemCategory(val)}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a category" />
+                    <SelectValue placeholder="Select a category"/>
                   </SelectTrigger>
                   <SelectContent>
                     {CATEGORIES.map((category) => (
@@ -186,7 +195,8 @@ export default function ShoppingListDetail() {
                     .filter((item) => item.category === category)
                     .map((item) => (
                       <div key={item.id} className="flex items-center p-2 rounded-lg border hover:bg-secondary/25">
-                        <Checkbox checked={item.is_completed} onCheckedChange={() => toggleItemCompleted(listId, item.id, item.is_completed)} />
+                        <Checkbox checked={item.is_completed}
+                                  onCheckedChange={() => toggleItemCompleted(listId, item.id, item.is_completed)}/>
                         <span
                           className={`flex-1 text-left break-all mx-2 ${item.is_completed ? 'line-through text-gray-500' : 'text-gray-900'}`}
                           onClick={() => toggleItemCompleted(listId, item.id, item.is_completed)}
@@ -194,7 +204,8 @@ export default function ShoppingListDetail() {
                           {item.name}
                         </span>
 
-                        <Badge variant="outline" className={`text-xs ${item.is_completed ? 'line-through text-gray-500' : 'text-gray-900'}`}>
+                        <Badge variant="outline"
+                               className={`text-xs ${item.is_completed ? 'line-through text-gray-500' : 'text-gray-900'}`}>
                           {item.category ?? 'none'}
                         </Badge>
 
@@ -206,10 +217,10 @@ export default function ShoppingListDetail() {
                           }}
                           className="rounded-full p-1 pr-4 hover:bg-third/80"
                         >
-                          <Pencil className="text-third" />
+                          <Pencil className="text-third"/>
                         </Button>
 
-                        <DeleteListItem item={item} handleDeleteItem={() => deleteShoppingListItem(listId, item.id)} />
+                        <DeleteListItem item={item} handleDeleteItem={() => deleteShoppingListItem(listId, item.id)}/>
                       </div>
                     ))}
                 </div>
@@ -228,11 +239,14 @@ export default function ShoppingListDetail() {
                   {curShoppingList.items
                     .filter((item) => !item.category)
                     .map((item) => (
-                      <div key={item.id} className="flex items-center space-x-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors">
-                        <Checkbox checked={item.is_completed} onCheckedChange={() => toggleItemCompleted(listId, item.id, item.is_completed)} />
+                      <div key={item.id}
+                           className="flex items-center space-x-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors">
+                        <Checkbox checked={item.is_completed}
+                                  onCheckedChange={() => toggleItemCompleted(listId, item.id, item.is_completed)}/>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between">
-                            <span className={`font-medium ${item.is_completed ? 'line-through text-muted-foreground' : ''}`}>{item.name}</span>
+                            <span
+                              className={`font-medium ${item.is_completed ? 'line-through text-muted-foreground' : ''}`}>{item.name}</span>
                             <div className="flex items-center space-x-2">
                               {/* {item.estimatedPrice > 0 && (
                                 <span className={`text-sm font-medium ${item.completed ? 'text-green-600' : 'text-muted-foreground'}`}>
@@ -245,7 +259,7 @@ export default function ShoppingListDetail() {
                                 onClick={() => deleteShoppingListItem(listId, item.id)}
                                 className="text-destructive hover:text-destructive"
                               >
-                                <Trash2 className="w-4 h-4" />
+                                <Trash2 className="w-4 h-4"/>
                               </Button>
                             </div>
                           </div>
@@ -262,7 +276,7 @@ export default function ShoppingListDetail() {
         {curShoppingList?.items.length === 0 && (
           <Card>
             <CardContent className="text-center py-12">
-              <Circle className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+              <Circle className="w-12 h-12 mx-auto mb-4 text-muted-foreground"/>
               <h3 className="text-lg font-semibold mb-2">No items yet</h3>
               <p className="text-muted-foreground">Add your first item to get started!</p>
             </CardContent>
@@ -273,7 +287,7 @@ export default function ShoppingListDetail() {
         <Card className="mt-8">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <CheckCircle2 className="w-5 h-5 text-primary" />
+              <CheckCircle2 className="w-5 h-5 text-primary"/>
               <span>Progress Overview</span>
             </CardTitle>
           </CardHeader>
@@ -309,7 +323,8 @@ export default function ShoppingListDetail() {
 
               <div className="flex justify-center space-x-4 pt-4">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-primary">{curShoppingList?.items.filter((item) => item.is_completed).length}</div>
+                  <div
+                    className="text-2xl font-bold text-primary">{curShoppingList?.items.filter((item) => item.is_completed).length}</div>
                   <div className="text-sm text-muted-foreground">Completed</div>
                 </div>
                 <div className="text-center">

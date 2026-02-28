@@ -91,6 +91,11 @@ spec:
                 secretKeyRef:
                   name: mysql-credentials
                   key: MYSQL_PASSWORD
+            - name: MINIKUBE_ENABLED
+              valueFrom:
+                configMapKeyRef:
+                  name: auth-service-config
+                  key: MINIKUBE_ENABLED
 
             # RabbitMQ configuration
             - name: RABBITMQ_HOST

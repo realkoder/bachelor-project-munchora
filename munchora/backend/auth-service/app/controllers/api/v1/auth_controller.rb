@@ -19,7 +19,11 @@ class Api::V1::AuthController < ApplicationController
     if Rails.env.production?
       redirect_to 'https://munchora.pro/home'
     else
-      redirect_to 'http://localhost:5173/home'
+      if ENV['MINIKUBE_ENABLED'].present?
+        redirect_to 'http://localhost/home'
+      else
+        redirect_to 'http://localhost:3000/home'
+      end
     end
   end
 

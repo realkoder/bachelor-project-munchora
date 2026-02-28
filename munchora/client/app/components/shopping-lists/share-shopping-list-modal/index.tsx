@@ -7,7 +7,7 @@ import { Card, CardContent } from '~/components/ui/card';
 import { Checkbox } from '~/components/ui/checkbox';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '~/components/ui/dialog';
 import { Input } from '~/components/ui/input';
-import useShoppingLists from '~/hooks/useShoppinglist';
+
 import useFetchUsers from '~/hooks/fetching/useFetchUsers';
 import type { IShoppingList } from '~/types/shoppingList.interface';
 import { useDebounce } from '~/hooks/fetching/useDebounceSearch';
@@ -15,6 +15,7 @@ import { PaginationNavigation } from '~/components/pagination-navigation';
 import { useAtomValue } from 'jotai';
 import { curUserAtom } from '~/atoms/curUserAtom';
 import { toast } from 'sonner';
+import useShoppingLists from "~/hooks/useShoppingList";
 
 interface ShareShoppingListModalProps {
   isOpen: boolean;
@@ -25,7 +26,7 @@ interface ShareShoppingListModalProps {
 
 export default function ShareShoppingListModal({ isOpen, closeModel, onClose, shoppingList }: ShareShoppingListModalProps) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
+  const [selectedUserIds, setSelectedUserIds] = useState<number[]>([]);
   const [isSharing, setIsSharing] = useState(false);
   const { shareList, unShareList } = useShoppingLists();
   const curUser = useAtomValue(curUserAtom);
@@ -44,7 +45,7 @@ export default function ShareShoppingListModal({ isOpen, closeModel, onClose, sh
     }
   }, [pagination, curPage]);
 
-  const handleUserToggle = (userId: string) => {
+  const handleUserToggle = (userId: number) => {
     if (userId === curUser?.user?.id || shoppingList?.shared_users.find((sharedUser) => sharedUser.id === userId)) {
       toast.error('Already shared with this user.');
       return;

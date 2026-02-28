@@ -27,7 +27,7 @@ export default function AuthBootstrapper() {
 
     (async () => {
       try {
-        const meResponse = await getMe('/auth/api/v1/auth/me');
+        const meResponse = await getMe('/auth-app/api/v1/auth/me');
         if (meResponse?.user) {
           setCurUser({ user: meResponse.user, status: 'SIGNED_IN' });
         } else {

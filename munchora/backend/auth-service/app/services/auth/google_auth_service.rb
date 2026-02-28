@@ -3,7 +3,11 @@ class Auth::GoogleAuthService
     if ENV['RAILS_ENV'] == 'production'
       'https://munchora.pro/auth/api/v1/auth/google/callback'
     else
-      'http://localhost:3000/auth/api/v1/auth/google/callback'
+      if ENV['MINIKUBE_ENABLED'].present?
+        'http://localhost/auth-app/api/v1/auth/google/callback'
+      else
+        'http://localhost:3000/auth/api/v1/auth/google/callback'
+      end
     end
 
   def self.get_redirect_uri

@@ -22,7 +22,7 @@ const useAuth = () => {
 
   const createNewUser = async (user: ICreateUser) => {
     try {
-      const newUserData = await postUser('/auth/api/v1/users', {
+      const newUserData = await postUser('/auth-app/api/v1/users', {
         method: 'POST',
         data: { user },
       });
@@ -57,7 +57,7 @@ const useAuth = () => {
   };
 
   const signOutUser = async () => {
-    const signedOutRes = await signOut('/auth/api/v1/auth/logout', { method: 'DELETE' });
+    const signedOutRes = await signOut('/auth-app/api/v1/auth/logout', { method: 'DELETE' });
 
     if (signedOutRes.message) {
       setRecipes(null);
@@ -72,7 +72,7 @@ const useAuth = () => {
 
   const updateUser = async (first_name: string, last_name: string, bio: string) => {
     try {
-      const res = await putUser(`/auth/api/v1/users/${curUser?.user?.id}`, { method: 'PUT', data: { first_name, last_name, bio } });
+      const res = await putUser(`/auth-app/api/v1/users/${curUser?.user?.id}`, { method: 'PUT', data: { first_name, last_name, bio } });
       setCurUser((cur) => {
         if (!cur || !cur.user) return undefined;
         return { ...cur, user: { ...cur.user, fullname: res.fullname, bio: res.bio } };
@@ -85,7 +85,7 @@ const useAuth = () => {
 
   const deleteUserNoReturn = async () => {
     try {
-      const signedOutRes = await deleteUser(`/auth/api/v1/users/${curUser?.user?.id}`, { method: 'DELETE' });
+      const signedOutRes = await deleteUser(`/auth-app/api/v1/users/${curUser?.user?.id}`, { method: 'DELETE' });
       if (signedOutRes.msg === 'OK') {
         await signOutUser();
         navigate('/');
