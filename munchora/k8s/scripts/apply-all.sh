@@ -118,6 +118,7 @@ echo ""
 # ====================
 echo "🌐 Deploying Nginx ingress..."
 kubectl apply -f ingress/
+kubectl apply -f newrelic/
 echo "✅ Nginx ingress deployed"
 echo ""
 

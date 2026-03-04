@@ -107,6 +107,7 @@ echo ""
 
 if [[ $REPLY =~ ^[Yy][Ee][Ss]$ ]]; then
     echo "🔐 Deleting secrets..."
+    kubectl delete secret newrelic-license --ignore-not-found=true
     kubectl delete secret mysql-credentials --ignore-not-found=true
     kubectl delete secret rabbitmq-credentials --ignore-not-found=true
     kubectl delete secret auth-service-master-key --ignore-not-found=true

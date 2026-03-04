@@ -43,18 +43,19 @@ spec:
             exec:
               command:
                 - rabbitmq-diagnostics
-                - check_port_connectivity
-            initialDelaySeconds: 60
+                - -q
+                - ping
+            initialDelaySeconds: 120
             periodSeconds: 30
             timeoutSeconds: 10
+            failureThreshold: 5
           readinessProbe:
-            exec:
-              command:
-                - rabbitmq-diagnostics
-                - check_port_connectivity
-            initialDelaySeconds: 20
+            tcpSocket:
+              port: 5672
+            initialDelaySeconds: 30
             periodSeconds: 10
             timeoutSeconds: 5
+            failureThreshold: 3
           resources:
             requests:
               memory: '512Mi'

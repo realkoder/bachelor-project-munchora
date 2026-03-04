@@ -1,0 +1,36 @@
+common: &default_settings
+  license_key: <%= ENV['NEW_RELIC_LICENSE_KEY'] %>
+  app_name: <%= ENV['NEW_RELIC_APP_NAME'] %>
+  log_level: info
+
+  # APM
+  distributed_tracing:
+    enabled: true
+
+  # Logs in context - ties logs to traces
+  application_logging:
+    enabled: true
+    forwarding:
+      enabled: true
+      max_samples_stored: 10000
+    local_decorating:
+      enabled: false
+    metrics:
+      enabled: true
+
+development:
+  <<: *default_settings
+  monitor_mode: true
+
+test:
+  <<: *default_settings
+  monitor_mode: false
+
+staging:
+  <<: *default_settings
+  monitor_mode: true
+  app_name: <%= ENV['NEW_RELIC_APP_NAME'] %> (Staging)
+
+production:
+  <<: *default_settings
+  monitor_mode: true

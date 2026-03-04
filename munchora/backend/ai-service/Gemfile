@@ -50,6 +50,8 @@ gem 'sidekiq'
 
 gem 'redis'
 
+gem 'newrelic_rpm', '~> 10.2.0'
+
 # Jwt for auth
 gem 'jwt', '~> 3.1.2'
 

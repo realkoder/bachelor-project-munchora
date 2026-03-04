@@ -12,6 +12,22 @@ echo ""
 BASE_DIR="/Users/alexanderchristensen/Projects/software-udvikling/assignments/bachelor-project/munchora"
 
 # ====================
+# Newrelic License Key
+# ====================
+echo "📝 Creating newrelic license key..."
+NEWRELIC_LICENSE_KEY=$(grep NEW_RELIC_LICENSE_KEY "$BASE_DIR/backend/ai-service/.env.dev" | cut -d '=' -f2-)
+
+    if [ -n "NEWRELIC_LICENSE_KEY" ]; then
+        kubectl create secret generic newrelic-license \
+            --from-literal=NEW_RELIC_LICENSE_KEY="$NEWRELIC_LICENSE_KEY" \
+            --dry-run=client -o yaml | kubectl apply -f -
+        echo "✅ newrelic license key created"
+    else
+        echo "⚠️  Warning: NEWRELIC_LICENSE_KEY not found!"
+    fi
+echo ""
+
+# ====================
 # MySQL Credentials
 # ====================
 echo "📝 Creating MySQL credentials secret..."

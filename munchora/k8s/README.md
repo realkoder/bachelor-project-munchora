@@ -4,76 +4,11 @@ This directory contains Kubernetes manifests for deploying the Munchora microser
 
 ## Architecture
 
-- **5 Rails API Services**: auth, recipes, shopping-lists, ai, notifications
-- **4 MySQL Databases**: Separate StatefulSets for auth, recipes, shopping-lists, ai
+- **5 Rails API Services**: auth-service, recipes-service, shopping-lists-service, ai-service, notifications-service
+- **4 MySQL Databases**: Separate StatefulSets for auth-service, recipes-service, shopping-lists-service, ai-service
 - **RabbitMQ**: Message queue for inter-service communication
 - **Frontend**: React Router 7 SSR application
-- **Nginx Ingress**: Single entry point routing to all services
-
-## Directory Structure
-
-The k8s manifests are organized by component type for better maintainability:
-
-```
-k8s/
-├── README.md                                  # This file
-├── 02-secrets.yaml.template                   # Template for secrets
-├── base/
-│   └── configmaps/
-│       └── global-config.yaml                 # Global configuration for all services
-├── infrastructure/
-│   ├── mysql/
-│   │   ├── auth-mysql/
-│   │   │   ├── service.yaml                   # Auth MySQL service
-│   │   │   └── statefulset.yaml               # Auth MySQL StatefulSet
-│   │   ├── recipes-mysql/
-│   │   │   ├── service.yaml
-│   │   │   └── statefulset.yaml
-│   │   ├── shopping-lists-mysql/
-│   │   │   ├── service.yaml
-│   │   │   └── statefulset.yaml
-│   │   └── ai-mysql/
-│   │       ├── service.yaml
-│   │       └── statefulset.yaml
-│   └── rabbitmq/
-│       ├── service.yaml                       # RabbitMQ AMQP + Management services
-│       └── statefulset.yaml                   # RabbitMQ StatefulSet
-├── services/
-│   ├── auth-service/
-│   │   ├── configmap.yaml                     # Service-specific configuration
-│   │   ├── service.yaml                       # Kubernetes Service
-│   │   └── deployment.yaml                    # Main server deployment
-│   ├── recipes-service/
-│   │   ├── configmap.yaml
-│   │   ├── service.yaml
-│   │   ├── server-deployment.yaml             # Main Rails server
-│   │   └── consumer-deployment.yaml           # RabbitMQ consumer
-│   ├── shopping-lists-service/
-│   │   ├── configmap.yaml
-│   │   ├── service.yaml
-│   │   └── deployment.yaml
-│   ├── ai-service/
-│   │   ├── configmap.yaml
-│   │   ├── service.yaml
-│   │   └── _full.yaml                         # Combined deployments (server, consumer, sidekiq)
-│   └── notifications-service/
-│       ├── configmap.yaml
-│       ├── service.yaml
-│       └── _full.yaml                         # Combined deployments (server, consumer)
-├── frontend/
-│   ├── configmap.yaml                         # Frontend configuration
-│   ├── service.yaml                           # Frontend service
-│   └── _full.yaml                             # Frontend deployment
-├── ingress/
-│   └── _full.yaml                             # Nginx ConfigMap, Deployment, Service, Ingress
-└── scripts/
-    ├── create-secrets.sh                      # Create K8s secrets
-    ├── apply-all.sh                           # Apply manifests in order
-    ├── delete-all.sh                          # Clean up resources
-    └── run-migrations.sh                      # Run DB migrations
-
-Note: Files named `_full.yaml` contain multiple resources that should ideally be split into separate files (e.g., server-deployment.yaml, consumer-deployment.yaml). They work as-is but can be further organized.
-```
+- **Nginx Ingress**: Single entry point routing to all services and client
 
 ## Prerequisites
 
@@ -89,9 +24,17 @@ Note: Files named `_full.yaml` contain multiple resources that should ideally be
 # Start minikube with sufficient resources
 minikube start --cpus=4 --memory=8192
 
-# Enable required addons
-minikube addons enable ingress
-minikube addons enable metrics-server
+# Install ingress-nginx with Helm
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo update
+
+helm install ingress-nginx ingress-nginx/ingress-nginx \
+  --namespace ingress-nginx \
+  --create-namespace \
+  -f ingress/values.yaml
+
+# Test metrics works from ingress-nginx-controller-metrics -> http://localhost:10254/metrics
+kubectl port-forward -n ingress-nginx svc/ingress-nginx-controller-metrics 10254:10254
 
 # Verify cluster is running
 kubectl cluster-info
@@ -143,14 +86,14 @@ echo "<MINIKUBE_IP> munchora.local" | sudo tee -a /etc/hosts
 
 ```bash
 # Open in browser
-open http://munchora.local
+open http://localhost
 
 # Test individual services
-curl http://munchora.local/auth/health
-curl http://munchora.local/recipes/health
-curl http://munchora.local/ai/health
-curl http://munchora.local/shopping-lists/health
-curl http://munchora.local/notifications/health
+curl http://localhost/auth/health
+curl http://localhost/recipes/health
+curl http://localhost/ai/health
+curl http://localhost/shopping-lists/health
+curl http://localhost/notifications/health
 ```
 
 ## Development Workflow
@@ -261,21 +204,6 @@ kubectl exec -i deployment/auth-mysql -- mysql -u root -padmin auth_development 
 # Drop and recreate a database (WARNING: destroys data)
 kubectl exec -it deployment/auth-service -- bundle exec rails db:drop db:create db:migrate
 ```
-
-## Volume Mounts for Live Reload
-
-All services have their source code mounted as hostPath volumes in minikube:
-
-- **Backend services**: `/Users/alexanderchristensen/Projects/software-udvikling/assignments/bachelor-project/munchora/backend/<service>` → `/app`
-- **Frontend**: `/Users/alexanderchristensen/Projects/software-udvikling/assignments/bachelor-project/munchora/client` → `/app`
-
-Changes to code on your local machine will be reflected in the pods. However, you may need to restart the pod to pick up changes:
-
-```bash
-kubectl rollout restart deployment/<service-name>
-```
-
-For Rails services, consider using a file watcher or reloader in development mode.
 
 ## Scaling Services
 
@@ -424,42 +352,112 @@ kubectl get secret recipes-service-master-key -o yaml
 kubectl logs deployment/auth-service | grep -i credential
 ```
 
-## Differences from Docker Compose
+## New Relic monitoring
 
-### Service Discovery
-- **Docker Compose**: Service name as hostname (e.g., `auth-db`)
-- **Kubernetes**: Service DNS (e.g., `auth-mysql-service` or `auth-mysql-service.default.svc.cluster.local`)
+Using New Relic monitoring Rails applicaitons, kubernetes cluster, client, databases and RabbitMQ
 
-### Networking
-- **Docker Compose**: Bridge network, port mapping
-- **Kubernetes**: ClusterIP services, Ingress for external access
+```bash
+helm repo add newrelic https://helm-charts.newrelic.com
 
-### Storage
-- **Docker Compose**: Named volumes
-- **Kubernetes**: PersistentVolumeClaims with StorageClass
+helm repo update
 
-### Secrets
-- **Docker Compose**: .env files
-- **Kubernetes**: Secret resources with base64 encoding
+kubectl create namespace newrelic
 
-### Scaling
-- **Docker Compose**: Limited scaling support
-- **Kubernetes**: Full horizontal pod autoscaling
+# important LICENSE_KEY is added to newrelic/values.yaml execution
+helm install newrelic-bundle newrelic/nri-bundle \
+  --namespace newrelic \
+  -f newrelic/values.yaml # important LICENSE_KEY is added to newrelic/values.yaml execution
 
-## Production Considerations
+# If need to install again run this: helm uninstall newrelic-bundle -n newrelic
 
-This configuration is optimized for local development with minikube. For production deployment:
+# Verify it works properly by checking the logs  
+kubectl logs -n newrelic -l app.kubernetes.io/name=nri-prometheus -f
+```
 
-1. **Replace hostPath volumes** with NFS, EFS, or cloud storage
-2. **Add resource limits** appropriate for production workload
-3. **Use production-grade ingress** (AWS ALB, GCP Load Balancer, etc.)
-4. **Enable TLS** with cert-manager and Let's Encrypt
-5. **Use managed databases** (RDS, Cloud SQL) instead of in-cluster MySQL
-6. **Add health checks** to all deployments
-7. **Configure horizontal pod autoscaling** based on metrics
-8. **Use secrets management** (AWS Secrets Manager, Vault) instead of K8s secrets
-9. **Add monitoring** (Prometheus, Grafana) and logging (ELK, Loki)
-10. **Implement network policies** for service isolation
+### Setting up for Rails app
+
+Add to Gemfile
+
+```ruby
+gem 'newrelic_rpm', '~> 10.2.0'
+```
+
+Then `bundle install`
+
+Create `config/newrelic.yml` in your Rails app:
+
+```yaml
+common: &default_settings
+  license_key: <%= ENV['NEW_RELIC_LICENSE_KEY'] %>
+  app_name: <%= ENV['NEW_RELIC_APP_NAME'] %>
+  log_level: info
+
+  # APM
+  distributed_tracing:
+    enabled: true
+
+  # Logs in context - ties logs to traces
+  application_logging:
+    enabled: true
+    forwarding:
+      enabled: true
+      max_samples_stored: 10000
+    local_decorating:
+      enabled: false
+    metrics:
+      enabled: true
+
+development:
+  <<: *default_settings
+  monitor_mode: true
+
+test:
+  <<: *default_settings
+  monitor_mode: false
+
+staging:
+  <<: *default_settings
+  monitor_mode: true
+  app_name: <%= ENV['NEW_RELIC_APP_NAME'] %> (Staging)
+
+production:
+  <<: *default_settings
+  monitor_mode: true
+```
+
+Add following to `config/environments/development`
+
+```ruby
+Rails.application.configure do
+  # existing config...
+
+  # Log to stdout for New Relic log forwarding
+  config.logger = ActiveSupport::Logger.new($stdout)
+  config.log_level = :info
+
+  # Tag logs with request/trace IDs for NR log correlation
+  config.log_tags = [:request_id]
+end
+```
+
+Create `config/initializers/new_relic_logging.rb`
+
+```ruby
+
+if defined?(NewRelic)
+  require 'new_relic/agent/logging'
+end
+```
+
+Get the logs for the rails pod and ensure they contain a string like below - link provided for newrelic dashboard
+
+```text
+** [NewRelic][2026-03-04 21:25:09 +0000 ai-service-74c75cdb9-882g4 (1)] INFO : Reporting to: https://rpm.eu.newrelic.com/accounts/7768716/applications/389356952
+```
+
+<br>
+
+---
 
 ## Additional Resources
 

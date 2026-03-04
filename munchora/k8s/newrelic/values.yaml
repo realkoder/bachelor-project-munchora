@@ -1,0 +1,22 @@
+global:
+  licenseKey: "YOUR_LICENSE_KEY_HERE"
+  cluster: "minikube-munchora"
+
+newrelic-infrastructure:
+  privileged: true
+
+kubeEvents:
+  enabled: true
+
+logging:
+  enabled: true
+
+nri-prometheus:
+  enabled: true
+  config:
+    standalone: false
+    targets:
+      - description: "ingress-nginx-metrics"
+        urls:
+          - "http://ingress-nginx-controller-metrics.ingress-nginx.svc.cluster.local:10254/metrics"
+        scrape_interval: "15s"

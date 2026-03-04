@@ -56,6 +56,17 @@ spec:
               name: http
           env:
             # Rails configuration
+            - name: NEW_RELIC_LICENSE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: newrelic-license
+                  key: NEW_RELIC_LICENSE_KEY
+            - name: NEW_RELIC_APP_NAME
+              value: "munchora-recipes-service"
+            - name: NEW_RELIC_LOG
+              value: "stdout"          # sends logs to stdout so NR logging picks them up
+            - name: NEW_RELIC_DISTRIBUTED_TRACING_ENABLED
+              value: "true"
             - name: RAILS_ENV
               valueFrom:
                 configMapKeyRef:
