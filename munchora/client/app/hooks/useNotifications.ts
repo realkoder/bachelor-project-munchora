@@ -3,7 +3,10 @@ import {Consumer, createConsumer} from '@rails/actioncable';
 import useShoppingListsEvents from './useShoppingListEvents';
 import useRecipeEvents from "~/hooks/useRecipeEvents";
 
-const WEBSOCKET_URL = process.env.NODE_ENV === 'development' ? 'ws://localhost:3000/notifications/cable' : 'wss://munchora.pro/notifications/cable';
+const rawBaseUrl = import.meta.env.VITE_BASE_URL || 'localhost:3000';
+const baseUrl = rawBaseUrl.replace(/^https?:\/\//, '');
+
+const WEBSOCKET_URL = process.env.NODE_ENV === 'development' ? `ws://${baseUrl}/notifications/cable` : 'wss://munchora.pro/notifications/cable';
 
 export enum NotificationType {
   RECIPE_CREATED = 'recipe_created',
