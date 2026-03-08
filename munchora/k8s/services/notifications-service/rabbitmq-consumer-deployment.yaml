@@ -85,6 +85,13 @@ spec:
                   key: RESEND_API_KEY
                   optional: true
 
+            # Upstash Redis URL
+            - name: UPSTASH_REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: upstash-redis
+                  key: UPSTASH_REDIS_URL
+
           resources:
             requests:
               memory: '256Mi'

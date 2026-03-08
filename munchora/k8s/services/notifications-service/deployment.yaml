@@ -45,6 +45,17 @@ spec:
               name: http
           env:
             # Rails configuration
+            - name: NEW_RELIC_LICENSE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: newrelic-license
+                  key: NEW_RELIC_LICENSE_KEY
+            - name: NEW_RELIC_APP_NAME
+              value: "munchora-notifications-service"
+            - name: NEW_RELIC_LOG
+              value: "stdout"          # sends logs to stdout so NR logging picks them up
+            - name: NEW_RELIC_DISTRIBUTED_TRACING_ENABLED
+              value: "true"
             - name: RAILS_ENV
               valueFrom:
                 configMapKeyRef:
@@ -97,6 +108,13 @@ spec:
                   name: resend-api
                   key: RESEND_API_KEY
                   optional: true
+
+            # Upstash Redis URL (for Sidekiq)
+            - name: UPSTASH_REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: upstash-redis
+                  key: UPSTASH_REDIS_URL
 
           livenessProbe:
             httpGet:
