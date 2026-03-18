@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+  has_paper_trail
+
   validates :email, presence: true, length: { minimum: 6, maximum: 100 }, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }, if: -> { provider.blank? }
 
   validates :first_name, presence: true, length: { minimum: 2, maximum: 60 }

@@ -125,6 +125,26 @@ end
 
 <br>
 
+## Adding papertrails
+
+Add gem to Gemfil
+
+```ruby
+gem 'paper_trail'
+```
+
+Then run `bundle install` or rebuild docker container if docker-compose `docker-compose -f docker-compose.dev.yml build <service name e.g. auth>`
+
+Create the migration for versions schema `rails generate paper_trail:install`
+
+Run the migration `rails db:migrate`
+
+And then add this for the models to be versioned `has_paper_trail`
+
+---
+
+<br>
+
 # Testing
 
 ## Configuring RSpec
