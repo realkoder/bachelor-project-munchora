@@ -1,4 +1,6 @@
 class ShoppingList < ApplicationRecord
+  has_paper_trail
+
   belongs_to :owner, class_name: 'ShoppingListOwner'
 
   has_many :items, class_name: 'ShoppingListItem', dependent: :destroy

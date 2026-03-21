@@ -9,21 +9,21 @@ class ApplicationController < ActionController::API
   if Rails.env.production?
     # strict 3 requests per minute for sensitive API endpoints
     rate_limit to: 3,
-               within: 1.minute,
-               by: -> { request.domain },
-               with: -> { redirect_to disney_url, alert: 'Too many requests. Please try again later.', allow_other_host: true },
-               if: -> do
-                 (request.post? || request.put?) &&
-                   %w[/api/v1/users /api/v1/auth/login /api/v1/users/upload-image /api/v1/recipes/upload-image].any? do |path|
-                     path.is_a?(Regexp) ? request.path.match?(path) : request.path == path
-                   end
-               end
+      within: 1.minute,
+      by: -> { request.domain },
+      with: -> { redirect_to disney_url, alert: 'Too many requests. Please try again later.', allow_other_host: true },
+      if: -> do
+        (request.post? || request.put?) &&
+          %w[/api/v1/users /api/v1/auth/login /api/v1/users/upload-image /api/v1/recipes/upload-image].any? do |path|
+            path.is_a?(Regexp) ? request.path.match?(path) : request.path == path
+          end
+      end
 
     # More lenient 20 requests per minute for all other requests ===
     rate_limit to: 20,
-               within: 1.minute,
-               by: -> { request.domain },
-               with: -> { redirect_to disney_url, alert: 'Too many requests. Please try again later.', allow_other_host: true }
+      within: 1.minute,
+      by: -> { request.domain },
+      with: -> { redirect_to disney_url, alert: 'Too many requests. Please try again later.', allow_other_host: true }
   end
 
   # To be used as a fallback for unknown routes - directed from config/routes.rb
@@ -48,6 +48,9 @@ class ApplicationController < ActionController::API
     unless @current_user
       render json: { error: 'Unauthorized' }, status: :unauthorized
     end
+
+    PaperTrail.request.whodunnit = current_user&.id
+
   rescue JWT::DecodeError, ActiveRecord::RecordNotFound
     render json: { error: 'Unauthorized' }, status: :unauthorized
   end

@@ -1,4 +1,6 @@
 class ShoppingListOwner < ApplicationRecord
+  has_paper_trail
+
   has_many :shopping_lists, foreign_key: :owner_id, dependent: :destroy
   has_many :shopping_list_shares, dependent: :destroy
   has_many :shared_shopping_lists, through: :shopping_list_shares, source: :shopping_list

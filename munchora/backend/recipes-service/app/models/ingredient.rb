@@ -1,4 +1,6 @@
 class Ingredient < ApplicationRecord
+  has_paper_trail
+
   belongs_to :recipe
 
   validates :name, presence: true, length: { minimum: 1, maximum: 60 }

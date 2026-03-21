@@ -413,7 +413,7 @@ DEPENDENCIES
   kaminari (~> 1.2.2)
   mysql2 (~> 0.5)
   newrelic_rpm (~> 10.2.0)
-  paper_trail
+  paper_trail (~> 17.0.0)
   puma (>= 5.0)
   rack-cors (~> 3.0.0)
   rails (~> 8.0.4)

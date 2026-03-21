@@ -17,7 +17,6 @@ class RabbitmqConsumer
         payload.receivers.each do |hashed_user|
           begin
             user = OpenStruct.new(hashed_user)
-            Rails.logger.info("LOOOK HERE NOW!! #{user.auth_user_id}")
             user_id = user.auth_user_id
             ActionCable.server.broadcast("notifications:#{user_id}", {
               type: payload.type,

@@ -130,7 +130,7 @@ end
 Add gem to Gemfil
 
 ```ruby
-gem 'paper_trail'
+gem 'paper_trail', '~> 17.0.0'
 ```
 
 Then run `bundle install` or rebuild docker container if docker-compose `docker-compose -f docker-compose.dev.yml build <service name e.g. auth>`

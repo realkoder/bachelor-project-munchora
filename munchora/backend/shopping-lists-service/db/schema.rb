@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_01_16_201822) do
+ActiveRecord::Schema[8.0].define(version: 2026_03_21_160631) do
   create_table "shopping_list_items", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "category"
@@ -50,6 +50,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_16_201822) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["owner_id"], name: "index_shopping_lists_on_owner_id"
+  end
+
+  create_table "versions", charset: "utf8mb4", collation: "utf8mb4_general_ci", force: :cascade do |t|
+    t.string "whodunnit"
+    t.datetime "created_at"
+    t.bigint "item_id", null: false
+    t.string "item_type", limit: 191, null: false
+    t.string "event", null: false
+    t.text "object", size: :long
+    t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
   add_foreign_key "shopping_list_items", "shopping_list_owners", column: "added_by_id"

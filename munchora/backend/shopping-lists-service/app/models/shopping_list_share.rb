@@ -1,4 +1,6 @@
 class ShoppingListShare < ApplicationRecord
+  has_paper_trail
+
   belongs_to :shopping_list
   belongs_to :shopping_list_owner
 

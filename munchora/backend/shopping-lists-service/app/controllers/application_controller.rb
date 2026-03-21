@@ -9,9 +9,9 @@ class ApplicationController < ActionController::API
   if Rails.env.production?
     # More lenient 20 requests per minute for all other requests ===
     rate_limit to: 20,
-               within: 1.minute,
-               by: -> { request.domain },
-               with: -> { redirect_to disney_url, alert: 'Too many requests. Please try again later.', allow_other_host: true }
+      within: 1.minute,
+      by: -> { request.domain },
+      with: -> { redirect_to disney_url, alert: 'Too many requests. Please try again later.', allow_other_host: true }
   end
 
   # To be used as a fallback for unknown routes - directed from config/routes.rb
@@ -53,6 +53,7 @@ class ApplicationController < ActionController::API
       @current_shopping_list_owner.bio = @current_user.bio
       @current_shopping_list_owner.save!
     end
+    PaperTrail.request.whodunnit = current_user&.id
   rescue JWT::DecodeError, ActiveRecord::RecordNotFound
     render json: { error: 'Unauthorized' }, status: :unauthorized
   end

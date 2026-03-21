@@ -1,4 +1,6 @@
 class RecipeAuthor < ApplicationRecord
+  has_paper_trail
+
   has_many :recipes, dependent: :destroy
 
   validates :first_name, presence: true, length: { minimum: 2, maximum: 60 }

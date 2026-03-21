@@ -1,4 +1,6 @@
 class Recipe < ApplicationRecord
+  has_paper_trail
+
   belongs_to :recipe_author, optional: true
   has_many :ingredients, dependent: :destroy
   # has_many :recipe_comments, dependent: :destroy
@@ -14,8 +16,8 @@ class Recipe < ApplicationRecord
   validate :instructions_length_limit
   validates :difficulty, inclusion: { in: %w[easy medium hard] }, allow_nil: true
   validates :prep_time, :cook_time, :servings,
-            numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 100 },
-            allow_nil: true
+    numericality: { only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: 100 },
+    allow_nil: true
   validates :tags, length: { maximum: 10 }
   validates :cuisine, length: { maximum: 30 }
 
