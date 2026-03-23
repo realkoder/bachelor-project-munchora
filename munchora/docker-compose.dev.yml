@@ -31,6 +31,24 @@ services:
     networks:
       - app-network
 
+
+  # ==============================
+  # MYSQL
+  # ==============================
+  munchora-db:
+    image: mysql:8.0
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_USER: munchora
+      MYSQL_PASSWORD: admin
+    volumes:
+      - ./mysql-init.sql:/docker-entrypoint-initdb.d/init.sql
+      - munchora-db-data:/var/lib/mysql
+    networks:
+      - app-network
+
   # ==============================
   # RABBITMQ
   # ==============================
@@ -96,7 +114,7 @@ services:
       RAILS_ENV: development
       RAILS_RELATIVE_URL_ROOT: /ai
     depends_on:
-      ai-db:
+      munchora-db:
         condition: service_started
       rabbitmq:
         condition: service_healthy
@@ -107,7 +125,7 @@ services:
     environment:
       RAILS_ENV: development
     depends_on:
-      ai-db:
+      munchora-db:
         condition: service_started
       rabbitmq:
         condition: service_healthy
@@ -118,24 +136,10 @@ services:
     environment:
       RAILS_ENV: development
     depends_on:
-      ai-db:
+      munchora-db:
         condition: service_started
       rabbitmq:
         condition: service_healthy
-
-  ai-db:
-    image: mysql:8.0
-    ports:
-      - "3307:3306"
-    environment:
-      MYSQL_DATABASE: ai_development
-      MYSQL_ROOT_PASSWORD: admin
-      MYSQL_USER: munchora
-      MYSQL_PASSWORD: admin
-    volumes:
-      - ai-db-data:/var/lib/mysql
-    networks:
-      - app-network
 
   # ==============================
   # AUTH DOMAIN
@@ -155,24 +159,8 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
-      auth-db:
+      munchora-db:
         condition: service_started
-    networks:
-      - app-network
-
-  auth-db:
-    image: mysql:8.0
-    ports:
-      - "3308:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: admin
-      MYSQL_DATABASE: auth_development
-      MYSQL_USER: munchora
-      MYSQL_PASSWORD: admin
-    #      MYSQL_LOG_BIN_TRUST_FUNCTION_CREATORS: 1
-    #    command: --default-authentication-plugin=mysql_native_password --log-bin-trust-function-creators=1
-    volumes:
-      - auth-db-data:/var/lib/mysql
     networks:
       - app-network
 
@@ -212,7 +200,7 @@ services:
     environment:
       RAILS_ENV: development
     depends_on:
-      ai-db:
+      munchora-db:
         condition: service_started
       rabbitmq:
         condition: service_healthy
@@ -246,7 +234,7 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
-      recipes-db:
+      munchora-db:
         condition: service_started
 
   recipes-rabbitmq-consumer:
@@ -255,24 +243,10 @@ services:
     environment:
       RAILS_ENV: development
     depends_on:
-      recipes-db:
+      munchora-db:
         condition: service_started
       rabbitmq:
         condition: service_healthy
-
-  recipes-db:
-    image: mysql:8.0
-    ports:
-      - "3309:3306"
-    environment:
-      MYSQL_DATABASE: recipes_development
-      MYSQL_ROOT_PASSWORD: admin
-      MYSQL_USER: munchora
-      MYSQL_PASSWORD: admin
-    volumes:
-      - recipes-db-data:/var/lib/mysql
-    networks:
-      - app-network
 
   # ==============================
   # SHOPPING_LISTS DOMAIN
@@ -301,39 +275,15 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
-      shopping-lists-db:
+      munchora-db:
         condition: service_started
 
-#  shopping-lists-rabbitmq-consumer:
-#    <<: *shopping-lists-service
-#    command: bundle exec rails runner lib/rabbitmq_consumer_runner.rb
-#    environment:
-#      RAILS_ENV: development
-#    depends_on:
-#      recipes-db:
-#        condition: service_started
-#      rabbitmq:
-#        condition: service_healthy
-
-  shopping-lists-db:
-    image: mysql:8.0
-    ports:
-      - "3310:3306"
-    environment:
-      MYSQL_DATABASE: shopping_lists_development
-      MYSQL_ROOT_PASSWORD: admin
-      MYSQL_USER: munchora
-      MYSQL_PASSWORD: admin
-    volumes:
-      - shopping-lists-db-data:/var/lib/mysql
-    networks:
-      - app-network
-
 volumes:
-  ai-db-data:
-  auth-db-data:
-  shopping-lists-db-data:
-  recipes-db-data:
+  munchora-db-data:
+#  ai-db-data:
+#  auth-db-data:
+#  shopping-lists-db-data:
+#  recipes-db-data:
   rabbitmq_data: # Stores RabbitMQ data
   rabbitmq_log: # Stores RabbitMQ logs
 
