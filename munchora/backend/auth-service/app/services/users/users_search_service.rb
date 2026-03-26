@@ -11,7 +11,7 @@ class Users::UsersSearchService
     if @params[:search].present?
       query = "%#{@params[:search].downcase}%" # Matches any string that contains search param and ignores case
       users = users.where(
-        "LOWER(first_name || ' ' || last_name) LIKE ? OR LOWER(email) LIKE ?",
+        "LOWER(CONCAT(first_name, ' ', last_name)) LIKE ? OR LOWER(email) LIKE ?",
         query, query
       )
     end

@@ -70,41 +70,40 @@ jobs:
       fail-fast: false
       matrix:
         service:
-          - { name: 'ai', path: 'munchora/backend/ai-service', db: 'ai_test', port: 3307, master_key_secret: 'AI_MASTER_KEY' }
-          - { name: 'auth', path: 'munchora/backend/auth-service', db: 'auth_test', port: 3308, master_key_secret: 'AUTH_MASTER_KEY' }
-          - { name: 'notifications', path: 'munchora/backend/notifications-service', db: 'notifications_test', port: 3311, master_key_secret: 'NOTIFICATIONS_MASTER_KEY' }
-          - { name: 'recipes', path: 'munchora/backend/recipes-service', db: 'recipes_test', port: 3309, master_key_secret: 'RECIPES_MASTER_KEY' }
-          - { name: 'shopping-lists', path: 'munchora/backend/shopping-lists-service', db: 'shopping_lists_test', port: 3310, master_key_secret: 'SHOPPING_LISTS_MASTER_KEY' }
+          - { name: 'ai', path: 'munchora/backend/ai-service', db: 'ai_test', master_key_secret: 'AI_MASTER_KEY' }
+          - { name: 'auth', path: 'munchora/backend/auth-service', db: 'auth_test', master_key_secret: 'AUTH_MASTER_KEY' }
+          - { name: 'notifications', path: 'munchora/backend/notifications-service', master_key_secret: 'NOTIFICATIONS_MASTER_KEY' }
+          - { name: 'recipes', path: 'munchora/backend/recipes-service', db: 'recipes_test', master_key_secret: 'RECIPES_MASTER_KEY' }
+          - { name: 'shopping-lists', path: 'munchora/backend/shopping-lists-service', db: 'shopping_lists_test', master_key_secret: 'SHOPPING_LISTS_MASTER_KEY' }
 
-#    services:
-#      mysql:
-#        image: mysql:8.0
-#        env:
-#          MYSQL_ROOT_PASSWORD: admin
-#          MYSQL_DATABASE: ${{ matrix.service.db }}
-#          MYSQL_USER: munchora
-#          MYSQL_PASSWORD: admin
-#        ports:
-#          - ${{ matrix.service.port }}:3306
-#        options: >-
-#          --health-cmd="mysqladmin ping"
-#          --health-interval=10s
-#          --health-timeout=5s
-#          --health-retries=3
-#
-#      rabbitmq:
-#        image: rabbitmq:3-management-alpine
-#        env:
-#          RABBITMQ_DEFAULT_USER: guest
-#          RABBITMQ_DEFAULT_PASS: guest
-#        ports:
-#          - 5672:5672
-#          - 15672:15672
-#        options: >-
-#          --health-cmd="rabbitmq-diagnostics check_port_connectivity"
-#          --health-interval=10s
-#          --health-timeout=5s
-#          --health-retries=10
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: admin
+          MYSQL_USER: munchora
+          MYSQL_PASSWORD: admin
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -u root -padmin"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    #
+    #      rabbitmq:
+    #        image: rabbitmq:3-management-alpine
+    #        env:
+    #          RABBITMQ_DEFAULT_USER: guest
+    #          RABBITMQ_DEFAULT_PASS: guest
+    #        ports:
+    #          - 5672:5672
+    #          - 15672:15672
+    #        options: >-
+    #          --health-cmd="rabbitmq-diagnostics check_port_connectivity"
+    #          --health-interval=10s
+    #          --health-timeout=5s
+    #          --health-retries=10
 
     steps:
       - uses: actions/checkout@v4
@@ -114,7 +113,7 @@ jobs:
         run: |
           mkdir -p config
           echo "${{ secrets[matrix.service.master_key_secret] }}" > config/master.key
-      
+
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
@@ -123,13 +122,40 @@ jobs:
           bundler-cache: true
           working-directory: ${{ matrix.service.path }}
 
+      - name: Initialize MySQL databases
+        if: ${{ matrix.service.name != 'notifications' }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y mysql-client
+
+          # wait for MySQL service
+          for i in {1..30}; do
+            mysql -h 127.0.0.1 -u root -padmin -e "SELECT 1" && break
+            echo "Waiting for MySQL..."
+            sleep 2
+          done
+
+          mysql -h 127.0.0.1 -P 3306 -u root -padmin <<EOF
+          CREATE DATABASE IF NOT EXISTS ai_test;
+          CREATE DATABASE IF NOT EXISTS auth_test;
+          CREATE DATABASE IF NOT EXISTS shopping_lists_test;
+          CREATE DATABASE IF NOT EXISTS recipes_test;
+
+          GRANT ALL PRIVILEGES ON ai_test.* TO 'munchora'@'%';
+          GRANT ALL PRIVILEGES ON auth_test.* TO 'munchora'@'%';
+          GRANT ALL PRIVILEGES ON shopping_lists_test.* TO 'munchora'@'%';
+          GRANT ALL PRIVILEGES ON recipes_test.* TO 'munchora'@'%';
+
+          FLUSH PRIVILEGES;
+          EOF
+
       - name: Setup Database
         if: ${{ matrix.service.name != 'notifications' }}
         working-directory: ${{ matrix.service.path }}
         env:
           RAILS_ENV: test
-          DATABASE_HOST: 127.0.0.1
-          DATABASE_PORT: ${{ matrix.service.port }}
+          DB_HOST: 127.0.0.1
+          MYSQL_PORT: 3306
           MYSQL_USER: munchora
           MYSQL_PASSWORD: admin
         run: |
@@ -139,8 +165,8 @@ jobs:
         working-directory: ${{ matrix.service.path }}
         env:
           RAILS_ENV: test
-          DATABASE_HOST: 127.0.0.1
-          DATABASE_PORT: ${{ matrix.service.port }}
+          DB_HOST: 127.0.0.1
+          MYSQL_PORT: 3306
           MYSQL_USER: munchora
           MYSQL_PASSWORD: admin
         run: bundle exec rspec

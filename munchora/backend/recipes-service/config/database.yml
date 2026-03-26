@@ -32,9 +32,13 @@ development:
 # Do not set this db to the same as development or production.
 test:
   <<: *default
-  adapter: sqlite3
-  database: db/test.sqlite3
-  timeout: 5000
+  adapter: mysql2
+  encoding: utf8mb4
+  database: recipes_test
+  username: <%= ENV.fetch("MYSQL_USER", "munchora") %>
+  password: <%= ENV.fetch("MYSQL_PASSWORD", "admin") %>
+  port: <%= ENV.fetch("MYSQL_PORT", 3307) %>
+  host: <%= ENV.fetch("DB_HOST") { "127.0.0.1" } %>
 
 # As with config/credentials.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is
