@@ -1,17 +1,17 @@
-import { Plus, Save, Share2, Sparkles, Trash2, Wand2, X } from 'lucide-react';
-import { useState } from 'react';
-import { Button } from '~/components/ui/button';
-import { Card, CardContent } from '~/components/ui/card';
-import { Input } from '~/components/ui/input';
-import { Textarea } from '~/components/ui/textarea';
-import { NewRecipeAIGen } from './new-recipe-ai-gen';
-import { DeleteRecipeDialog } from './delete-recipe-dialog';
+import {Plus, Save, Share2, Sparkles, Trash2, Wand2, X} from 'lucide-react';
+import {useEffect, useState} from 'react';
+import {Button} from '~/components/ui/button';
+import {Card, CardContent} from '~/components/ui/card';
+import {Input} from '~/components/ui/input';
+import {Textarea} from '~/components/ui/textarea';
+import {NewRecipeAIGen} from './new-recipe-ai-gen';
+import {DeleteRecipeDialog} from './delete-recipe-dialog';
 import useRecipes from '~/hooks/useRecipes';
-import { RecipeImageUpload } from './recipe-image-upload';
-import { LoadingAiRecipe } from './new-recipe-ai-gen/loadingAiRecipe';
-import { useAtomValue } from 'jotai';
-import { curRecipeAtom } from '~/atoms/curRecipeAtom';
-import { toast } from 'sonner';
+import {RecipeImageUpload} from './recipe-image-upload';
+import {LoadingAiRecipe} from './new-recipe-ai-gen/loadingAiRecipe';
+import {useAtomValue} from 'jotai';
+import {curRecipeAtom} from '~/atoms/curRecipeAtom';
+import {toast} from 'sonner';
 
 export const AICreateTab = () => {
   const [aiPrompt, setAiPrompt] = useState('');
@@ -19,8 +19,13 @@ export const AICreateTab = () => {
   // const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const curRecipe = useAtomValue(curRecipeAtom);
-  const { changeCurRecipe, updateRecipe, updateRecipePrompting } = useRecipes();
+  const {changeCurRecipe, updateRecipe, updateRecipePrompting} = useRecipes();
   const [isRecipeChanged, setIsRecipeChanged] = useState(false);
+
+  useEffect(() => {
+    if (!curRecipe) return;
+    setIsGenerating(false);
+  }, [curRecipe])
 
   const handleEditRecipe = (field: string, value: any) => {
     if (!curRecipe) return;
@@ -56,9 +61,10 @@ export const AICreateTab = () => {
   return (
     <>
       {!curRecipe ? (
-        <NewRecipeAIGen aiPrompt={aiPrompt} setAiPrompt={setAiPrompt} isGenerating={isGenerating} setIsGenerating={setIsGenerating} />
+        <NewRecipeAIGen aiPrompt={aiPrompt} setAiPrompt={setAiPrompt} isGenerating={isGenerating}
+                        setIsGenerating={setIsGenerating}/>
       ) : isGenerating ? (
-        <LoadingAiRecipe />
+        <LoadingAiRecipe/>
       ) : (
         /* Generated Recipe Editor */
         <div className="grid lg:grid-cols-3 gap-8">
@@ -69,7 +75,7 @@ export const AICreateTab = () => {
                 <div className="flex flex-col md:flex-row items-center justify-between mb-6">
                   <div className="flex items-center space-x-3 m-2">
                     <div className="bg-gradient-to-br from-third/50 to-fourth p-2 rounded-lg">
-                      <Sparkles className="h-5 w-5 text-final" />
+                      <Sparkles className="h-5 w-5 text-final"/>
                     </div>
                     <div>
                       <h2 className="text-xl font-semibold text-slate-800">Your AI Recipe</h2>
@@ -77,8 +83,9 @@ export const AICreateTab = () => {
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Button variant="outline" size="sm" onClick={() => handleEditRecipe('is_public', !curRecipe.is_public)}>
-                      <Share2 className="h-4 w-4 mr-2" />
+                    <Button variant="outline" size="sm"
+                            onClick={() => handleEditRecipe('is_public', !curRecipe.is_public)}>
+                      <Share2 className="h-4 w-4 mr-2"/>
                       {curRecipe.is_public ? 'Make private' : 'Share'}
                     </Button>
                     <Button
@@ -86,18 +93,18 @@ export const AICreateTab = () => {
                       size="sm"
                       onClick={async () => {
                         setIsSaving(true);
-                        await updateRecipe({ ...curRecipe });
+                        await updateRecipe({...curRecipe});
                         setIsRecipeChanged(false);
                         setIsSaving(false);
                       }}
                     >
-                      <Save className="h-4 w-4 mr-2" />
+                      <Save className="h-4 w-4 mr-2"/>
                       Save Recipe
                     </Button>
                   </div>
                 </div>
 
-                <RecipeImageUpload />
+                <RecipeImageUpload/>
 
                 {/* Editable Title */}
                 <div className="mb-6">
@@ -178,7 +185,7 @@ export const AICreateTab = () => {
                       }}
                       className="text-fourth hover:text-final hover:bg-third"
                     >
-                      <Plus className="h-4 w-4 mr-1" />
+                      <Plus className="h-4 w-4 mr-1"/>
                       Add Ingredient
                     </Button>
                   </div>
@@ -205,7 +212,7 @@ export const AICreateTab = () => {
                           }}
                           className="text-red-500 hover:text-red-600 p-1"
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="h-4 w-4"/>
                         </Button>
                       </div>
                     ))}
@@ -225,14 +232,15 @@ export const AICreateTab = () => {
                         handleEditRecipe('instructions', newInstructions);
                       }}
                     >
-                      <Plus className="h-4 w-4 mr-1" />
+                      <Plus className="h-4 w-4 mr-1"/>
                       Add Step
                     </Button>
                   </div>
                   <div className="space-y-4">
                     {curRecipe.instructions.map((instruction, index) => (
                       <div key={index} className="flex space-x-4 group">
-                        <div className="flex-shrink-0 w-8 h-8 bg-third text-white rounded-full flex items-center justify-center text-sm font-semibold">
+                        <div
+                          className="flex-shrink-0 w-8 h-8 bg-third text-white rounded-full flex items-center justify-center text-sm font-semibold">
                           {index + 1}
                         </div>
                         <div className="flex-1 flex items-start space-x-2">
@@ -256,7 +264,7 @@ export const AICreateTab = () => {
                               handleEditRecipe('instructions', filteredInstructions);
                             }}
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="h-4 w-4"/>
                           </Button>
                         </div>
                       </div>
@@ -277,7 +285,7 @@ export const AICreateTab = () => {
                       }}
                       className="text-fourth hover:text-final hover:bg-third"
                     >
-                      <Plus className="h-4 w-4 mr-1" />
+                      <Plus className="h-4 w-4 mr-1"/>
                       Add Tag
                     </Button>
                   </div>
@@ -303,13 +311,13 @@ export const AICreateTab = () => {
                           }}
                           className="text-red-500 hover:text-red-600 p-1 rounded-full"
                         >
-                          <X className="h-3 w-3" />
+                          <X className="h-3 w-3"/>
                         </Button>
                       </div>
                     ))}
                   </div>
-                  <hr className="m-4 border-t border-slate-200" />
-                  <DeleteRecipeDialog recipeId={curRecipe.id} />
+                  <hr className="m-4 border-t border-slate-200"/>
+                  <DeleteRecipeDialog recipeId={curRecipe.id}/>
                 </div>
               </CardContent>
             </Card>
@@ -320,7 +328,7 @@ export const AICreateTab = () => {
             <Card className="border bg-secondary/50 backdrop-blur-sm shadow-sm sticky top-8">
               <CardContent className="p-6">
                 <h3 className="font-semibold text-slate-800 mb-4 flex items-center">
-                  <Wand2 className="h-5 w-5 mr-2 text-fourth" />
+                  <Wand2 className="h-5 w-5 mr-2 text-fourth"/>
                   Refine with AI
                 </h3>
 
@@ -333,7 +341,7 @@ export const AICreateTab = () => {
                     className="bg-white border-slate-200"
                   />
                   <Button className="w-full" disabled={isGenerating} onClick={() => handleUpdateRecipeByAi()}>
-                    <Sparkles className="h-4 w-4 mr-2" />
+                    <Sparkles className="h-4 w-4 mr-2"/>
                     Refine Recipe
                   </Button>
                 </div>
@@ -341,10 +349,12 @@ export const AICreateTab = () => {
                 <div className="mt-6 space-y-2">
                   <h4 className="text-sm font-medium text-slate-700">Quick Actions</h4>
                   <div className="grid grid-cols-2 gap-2">
-                    <Button variant="outline" size="sm" className="text-xs" onClick={() => triggerUpdateRecipeByAi('Make the recipe healthier.')}>
+                    <Button variant="outline" size="sm" className="text-xs"
+                            onClick={() => triggerUpdateRecipeByAi('Make the recipe healthier.')}>
                       Make Healthier
                     </Button>
-                    <Button variant="outline" size="sm" className="text-xs" onClick={() => triggerUpdateRecipeByAi('Add more spices.')}>
+                    <Button variant="outline" size="sm" className="text-xs"
+                            onClick={() => triggerUpdateRecipeByAi('Add more spices.')}>
                       Add Spice
                     </Button>
                     <Button
@@ -355,7 +365,8 @@ export const AICreateTab = () => {
                     >
                       Reduce Time
                     </Button>
-                    <Button variant="outline" size="sm" className="text-xs" onClick={() => triggerUpdateRecipeByAi('Add more proteins.')}>
+                    <Button variant="outline" size="sm" className="text-xs"
+                            onClick={() => triggerUpdateRecipeByAi('Add more proteins.')}>
                       More Protein
                     </Button>
                   </div>
@@ -389,7 +400,7 @@ export const AICreateTab = () => {
                       setAiPrompt('');
                     }}
                   >
-                    <Plus className="h-4 w-4 mr-2" />
+                    <Plus className="h-4 w-4 mr-2"/>
                     Create New Recipe
                   </Button>
                 </div>

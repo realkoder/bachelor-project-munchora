@@ -280,10 +280,6 @@ services:
 
 volumes:
   munchora-db-data:
-#  ai-db-data:
-#  auth-db-data:
-#  shopping-lists-db-data:
-#  recipes-db-data:
   rabbitmq_data: # Stores RabbitMQ data
   rabbitmq_log: # Stores RabbitMQ logs
 
