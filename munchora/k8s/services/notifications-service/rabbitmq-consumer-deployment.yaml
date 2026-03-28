@@ -39,7 +39,7 @@ spec:
             - bundle
             - exec
             - ruby
-            - lib/rabbitmq_consumer_runner.rb
+            - bin/rabbitmq_consumer_runner.rb
           env:
             # Rails configuration
             - name: RAILS_ENV

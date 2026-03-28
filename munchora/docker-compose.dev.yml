@@ -239,7 +239,7 @@ services:
 
   recipes-rabbitmq-consumer:
     <<: *recipes-service
-    command: bundle exec rails runner lib/rabbitmq_consumer_runner.rb
+    command: bundle exec rails runner bin/rabbitmq_consumer_runner.rb
     environment:
       RAILS_ENV: development
     depends_on:

@@ -1,5 +1,4 @@
-# app/lib/rabbitmq/ai_response_consumer.rb
-class AiResponseConsumer
+class Rabbitmq::AiResponseConsumer
   RECIPE_CREATED = 'recipe_created'
 
   def self.start
