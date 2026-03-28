@@ -1,4 +1,10 @@
 require_relative "../config/environment"
+
+if Rails.env.test?
+  puts "[RabbitMQ] Skipping consumer in test environment"
+  return
+end
+
 require_relative "rabbitmq/ai_response_consumer"
 
 STDOUT.sync = true
