@@ -20,7 +20,7 @@ class Auth::JsonWebToken
   def self.decode(token)
     decoded = JWT.decode(token, PUBLIC_KEY, true, algorithm: 'RS256')
     HashWithIndifferentAccess.new(decoded[0])
-  rescue JWT::DecodeError
+  rescue JWT::DecodeError => e
     Rails.logger.warn "JWT decode failed: #{e.message}"
     nil
   end

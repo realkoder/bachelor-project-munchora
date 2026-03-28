@@ -74,7 +74,7 @@ class Api::V1::AuthController < ApplicationController
       secure: Rails.env.production?,
       same_site: :lax,
       expires: 7.days.from_now
-      # expires: 24.hours.from_now
+    # expires: 24.hours.from_now
     }
   end
 end

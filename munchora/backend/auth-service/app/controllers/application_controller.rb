@@ -63,13 +63,13 @@ class ApplicationController < ActionController::API
       return
     end
 
-    decoded_user = Auth::JsonWebToken.decode(token)['user']
-    if decoded_user.nil? || !decoded_user['user_id']
-      return nil
-    end
+    decoded_token = Auth::JsonWebToken.decode(token)
+    return nil if decoded_token.nil?
+
+    decoded_user = decoded_token['user']
+    return nil if decoded_user['user_id'].nil?
 
     @current_user = User.find_by(id: decoded_user['user_id'])
-
   rescue JWT::DecodeError, ActiveRecord::RecordNotFound
     nil
   end
