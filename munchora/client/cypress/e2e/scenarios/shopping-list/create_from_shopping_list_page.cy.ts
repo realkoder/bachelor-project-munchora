@@ -1,9 +1,9 @@
 import { deleteListIfExist } from '../../../support/test_utils.cy';
 
-describe('Grocery List - Create', () => {
+describe('Shopping List - Create', () => {
   beforeEach(() => {
     cy.loginOrSignUpByApi();
-    cy.loadPage('groceryLists');
+    cy.loadPage('shoppingLists');
   });
 
   afterEach(() => {
@@ -11,15 +11,15 @@ describe('Grocery List - Create', () => {
   });
 
   it('shows no lists on first load', () => {
-    cy.contains('h3', 'No grocery lists yet').should('be.visible');
+    cy.contains('h3', 'No shopping lists yet').should('be.visible');
   });
 
-  it('creates default grocery list', () => {
+  it('creates default shopping list', () => {
     cy.contains('button', 'Create Your First List').click();
     cy.get('input[placeholder="Name Of Shopping List"]').should('have.value', 'Shopping 🛒');
   });
 
-  it('creates custom-named grocery list', () => {
+  it('creates custom-named shopping list', () => {
     const listName = 'Test List 🍹';
     cy.get('input[placeholder="New list name"]').type(listName);
     cy.contains('button', 'Create List').click();

@@ -4,7 +4,7 @@ if Rails.env.test?
   return
 end
 
-require_relative "rabbitmq/ai_response_consumer"
+require_relative "../lib/rabbitmq/ai_response_consumer"
 
 STDOUT.sync = true
 puts "[RabbitMQ] AI Response consumer booting..."

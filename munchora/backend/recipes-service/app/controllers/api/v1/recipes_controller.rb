@@ -12,7 +12,7 @@ class Api::V1::RecipesController < ApplicationController
       if current_user&.email == ADMIN_EMAIL
         Recipe.all
       elsif current_user
-        Recipe.where('is_public = ? OR user_id = ?', true, current_user.id)
+        Recipe.where('is_public = ? OR recipe_author_id = ?', true, current_user.id)
       else
         Recipe.where(is_public: true)
       end

@@ -38,7 +38,7 @@ const useAuth = () => {
 
   const loginUser = async (email: string, password: string) => {
     try {
-      const loginData = await postLogin('/auth/api/v1/auth/login', {
+      const loginData = await postLogin('/auth-app/api/v1/auth/login', {
         method: 'POST',
         data: { email, password },
       });

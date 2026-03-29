@@ -10,7 +10,7 @@ describe('Signup and login', () => {
     cy.get('[data-state="active"][data-orientation="horizontal"]').should('contain.text', 'Create account');
 
     // Now assert that the form is visible
-    cy.get('input[name="first_name"]', { timeout: 10000 }).should('be.visible').type('Random');
+    cy.get('input[name="first_name"]', {timeout: 10000}).should('be.visible').type('Random');
     cy.get('input[name="last_name"]').type('User');
     cy.get('input[name="email"]').type(email);
     cy.get('input[name="password"]').type(password);
@@ -21,7 +21,7 @@ describe('Signup and login', () => {
     cy.checkPageLoadedCorrectly('indexAuth');
   });
 
-  it('should login user when signed up', () => {
+  it('should login user when signed up and delete user', () => {
     cy.loadPage('signIn');
 
     cy.contains('Sign in').click();
@@ -31,6 +31,11 @@ describe('Signup and login', () => {
     cy.get('button[name="signinbtn"]').click();
 
     cy.checkPageLoadedCorrectly('indexAuth');
+
+    cy.loadPage('profile');
+    cy.contains('button', 'Delete').click();
+    cy.contains('button', 'Delete Account').click();
+    cy.checkPageLoadedCorrectly('indexNoAuth');
   });
 
   describe('login required', () => {

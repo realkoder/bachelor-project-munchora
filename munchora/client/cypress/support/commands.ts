@@ -46,9 +46,9 @@ const pages = {
     url: '/',
     check: () => cy.contains('h1', 'Discover Your Next').should('be.visible'),
   },
-  groceryLists: {
-    url: '/grocery-lists',
-    check: () => cy.contains('Grocery List').should('be.visible'),
+  shoppingLists: {
+    url: '/shopping-lists',
+    check: () => cy.contains('Shopping Lists').should('be.visible'),
   },
   profile: {
     url: '/profile',
@@ -93,14 +93,14 @@ Cypress.Commands.add('loginOrSignUpByApi', () => {
 
   cy.request({
     method: 'POST',
-    url: 'http://localhost:3000/auth/api/v1/auth/login',
+    url: 'http://localhost:3000/auth-app/api/v1/auth/login',
     body: { email, password },
     failOnStatusCode: false,
   }).then((resp) => {
     if (resp.status === 200 && resp.body.token) {
       setAuthFromResponse(resp);
     } else if (resp.status === 401) {
-      cy.request('POST', 'http://localhost:3000/auth/api/v1/users', {
+      cy.request('POST', 'http://localhost:3000/auth-app/api/v1/users', {
         user: {
           first_name: 'Test',
           last_name: 'User',
@@ -110,7 +110,7 @@ Cypress.Commands.add('loginOrSignUpByApi', () => {
         },
       })
         .then(() => {
-          return cy.request('POST', 'http://localhost:3000/auth/api/v1/auth/login', {
+          return cy.request('POST', 'http://localhost:3000/auth-app/api/v1/auth/login', {
             email,
             password,
           });
