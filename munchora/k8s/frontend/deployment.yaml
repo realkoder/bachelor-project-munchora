@@ -19,8 +19,9 @@ spec:
       containers:
         - name: frontend-app
           # Build this image locally: eval $(minikube docker-env) && docker build -t munchora-frontend -f Dockerfile.dev .
-          image: munchora-frontend:latest
-          imagePullPolicy: Never
+#          image: munchora-frontend:latest
+          image: ghcr.io/realkoder/bachelor-project-munchora/client:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 5173
               name: http

@@ -34,8 +34,9 @@ spec:
       containers:
         - name: notifications-service
           # Build this image locally: eval $(minikube docker-env) && docker build -t munchora-notifications-service -f Dockerfile.dev .
-          image: munchora-notifications-service:latest
-          imagePullPolicy: Never
+#          image: munchora-notifications-service:latest
+          image: ghcr.io/realkoder/bachelor-project-munchora/notifications-service:latest
+          imagePullPolicy: Always
           command:
             - bash
             - -c

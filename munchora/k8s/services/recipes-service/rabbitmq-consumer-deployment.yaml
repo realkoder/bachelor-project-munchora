@@ -44,8 +44,9 @@ spec:
               echo "RabbitMQ is ready!"
       containers:
         - name: recipes-consumer
-          image: munchora-recipes-service:latest
-          imagePullPolicy: Never
+#          image: munchora-recipes-service:latest
+          image: ghcr.io/realkoder/bachelor-project-munchora/recipes-service:latest
+          imagePullPolicy: Always
           command:
             - bundle
             - exec

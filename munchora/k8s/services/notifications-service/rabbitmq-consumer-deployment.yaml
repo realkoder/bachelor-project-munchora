@@ -33,13 +33,14 @@ spec:
               echo "RabbitMQ is ready!"
       containers:
         - name: notifications-consumer
-          image: munchora-notifications-service:latest
-          imagePullPolicy: Never
+#          image: munchora-notifications-service:latest
+          image: ghcr.io/realkoder/bachelor-project-munchora/notifications-service:latest
+          imagePullPolicy: Always
           command:
             - bundle
             - exec
             - ruby
-            - bin/rabbitmq_consumer_runner.rb
+            - lib/rabbitmq_consumer_runner.rb
           env:
             # Rails configuration
             - name: RAILS_ENV

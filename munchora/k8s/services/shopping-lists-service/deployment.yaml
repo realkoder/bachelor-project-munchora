@@ -45,8 +45,9 @@ spec:
       containers:
         - name: shopping-lists-service
           # Build this image locally: eval $(minikube docker-env) && docker build -t munchora-shopping-lists-service -f Dockerfile.dev .
-          image: munchora-shopping-lists-service:latest
-          imagePullPolicy: Never
+#          image: munchora-shopping-lists-service:latest
+          image: ghcr.io/realkoder/bachelor-project-munchora/shopping-lists-service:latest
+          imagePullPolicy: Always
           command:
             - bash
             - -c

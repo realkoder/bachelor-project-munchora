@@ -23,10 +23,10 @@ cd "$(dirname "$0")/.."
 # ====================
 # Delete Ingress
 # ====================
-echo "🌐 Deleting Nginx ingress..."
-kubectl delete -f ingress/ --ignore-not-found=true
-echo "✅ Nginx ingress deleted"
-echo ""
+#echo "🌐 Deleting Nginx ingress..."
+#kubectl delete -f ingress/*.yaml --ignore-not-found=true
+#echo "✅ Nginx ingress deleted"
+#echo ""
 
 # ====================
 # Delete Frontend

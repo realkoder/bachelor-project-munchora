@@ -1,0 +1,62 @@
+name: Build and Push Services
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "munchora/client/**"
+      - "munchora/backend/ai-service/**"
+      - "munchora/backend/auth-service/**"
+      - "munchora/backend/notifications-service/**"
+      - "munchora/backend/recipes-service/**"
+      - "munchora/backend/shopping-lists-service/**"
+      - ".github/workflows/docker-registry.yml"
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    strategy:
+      matrix:
+        service:
+          - name: client
+            path: munchora/client
+          - name: ai-service
+            path: munchora/backend/ai-service
+          - name: auth-service
+            path: munchora/backend/auth-service
+          - name: notifications-service
+            path: munchora/backend/notifications-service
+          - name: recipes-service
+            path: munchora/backend/recipes-service
+          - name: shopping-lists-service
+            path: munchora/backend/shopping-lists-service
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: ./${{ matrix.service.path }}
+          file: ./${{ matrix.service.path }}/Dockerfile.dev
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: |
+            ghcr.io/${{ github.repository }}/${{ matrix.service.name }}:latest
+            ghcr.io/${{ github.repository }}/${{ matrix.service.name }}:${{ github.sha }}
