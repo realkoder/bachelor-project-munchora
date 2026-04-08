@@ -13,43 +13,7 @@ on:
       - ".github/workflows/docker-registry.yml"
 
 jobs:
-  changes:
-    runs-on: ubuntu-latest
-    outputs:
-      client: ${{ steps.filter.outputs.client }}
-      ai: ${{ steps.filter.outputs.ai }}
-      auth: ${{ steps.filter.outputs.auth }}
-      notifications: ${{ steps.filter.outputs.notifications }}
-      recipes: ${{ steps.filter.outputs.recipes }}
-      shopping: ${{ steps.filter.outputs.shopping }}
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: dorny/paths-filter@v3
-        id: filter
-        with:
-          filters: |
-            client:
-              - 'munchora/client/**'
-            ai:
-              - 'munchora/backend/ai-service/**'
-              - '!**/*.spec.*'
-            auth:
-              - 'munchora/backend/auth-service/**'
-              - '!**/*.spec.*'
-            notifications:
-              - 'munchora/backend/notifications-service/**'
-              - '!**/*.spec.*'
-            recipes:
-              - 'munchora/backend/recipes-service/**'
-              - '!**/*.spec.*'
-            shopping:
-              - 'munchora/backend/shopping-lists-service/**'
-              - '!**/*.spec.*'
-
   docker:
-    needs: changes
     runs-on: ubuntu-latest
 
     permissions:
@@ -61,22 +25,16 @@ jobs:
         service:
           - name: client
             path: munchora/client
-            enabled: ${{ needs.changes.outputs.client == 'true' }}
           - name: ai-service
             path: munchora/backend/ai-service
-            enabled: ${{ needs.changes.outputs.ai == 'true' }}
           - name: auth-service
             path: munchora/backend/auth-service
-            enabled: ${{ needs.changes.outputs.auth == 'true' }}
           - name: notifications-service
             path: munchora/backend/notifications-service
-            enabled: ${{ needs.changes.outputs.notifications == 'true' }}
           - name: recipes-service
             path: munchora/backend/recipes-service
-            enabled: ${{ needs.changes.outputs.recipes == 'true' }}
           - name: shopping-lists-service
             path: munchora/backend/shopping-lists-service
-            enabled: ${{ needs.changes.outputs.shopping == 'true' }}
 
     steps:
       - name: Checkout
@@ -93,7 +51,6 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push
-        if: matrix.service.enabled == 'true'
         uses: docker/build-push-action@v5
         with:
           context: ./${{ matrix.service.path }}
@@ -103,5 +60,3 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository }}/${{ matrix.service.name }}:latest
             ghcr.io/${{ github.repository }}/${{ matrix.service.name }}:${{ github.sha }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
