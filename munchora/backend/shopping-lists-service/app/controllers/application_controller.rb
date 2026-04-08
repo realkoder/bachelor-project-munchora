@@ -7,7 +7,7 @@ class ApplicationController < ActionController::API
   before_action :parse_json_request # ensures json content is valid and can be parsed
 
   if Rails.env.production?
-    # More lenient 20 requests per minute for all other requests ===
+    # More lenient 20 requests per minute for all other requests
     rate_limit to: 20,
       within: 1.minute,
       by: -> { request.domain },

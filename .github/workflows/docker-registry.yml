@@ -32,7 +32,6 @@ jobs:
           filters: |
             client:
               - 'munchora/client/**'
-              - '!munchora/client/**/*.spec.*'
             ai:
               - 'munchora/backend/ai-service/**'
               - '!**/*.spec.*'
