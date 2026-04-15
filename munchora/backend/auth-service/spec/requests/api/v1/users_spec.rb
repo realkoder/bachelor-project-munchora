@@ -12,93 +12,98 @@ RSpec.describe Api::V1::UsersController, type: :request do
   # ======================================
   # GET: INDEX
   # ======================================
-  context '#index' do
-    context 'authentication' do
-      it 'returns 401 if no token is provided (decision: unauthenticated)' do
+  describe '#index' do
+    context 'unauthenticated user' do
+      it 'returns 401' do
         get '/api/v1/users'
         expect(response).to have_http_status(:unauthorized)
       end
-
-      it 'returns 200 with valid token (decision: authenticated)' do
-        cookies[:jwt_auth] = token
-        get '/api/v1/users'
-        expect(response).to have_http_status(:ok)
-      end
     end
 
-    context 'without search query' do
-      it 'returns all users paginated' do
+    context 'authenticated user' do
+      it 'returns list of 10 users' do
         cookies[:jwt_auth] = token
         get '/api/v1/users'
+        json = JSON.parse(response.body)
 
         expect(response).to have_http_status(:ok)
-        json = JSON.parse(response.body)
         expect(json['data'].size).to eq(10)
-        expect(json['pagination']).to include('current_page', 'total_pages', 'total_count')
       end
 
-      it 'returns users in correct json #fullname and without password_digest' do
-        cookies[:jwt_auth] = token
-        get '/api/v1/users'
-
-        json = JSON.parse(response.body)
-        json['data'].each do |user_json|
-          expect(user_json['fullname']).to eq("#{user_json['first_name']} #{user_json['last_name']}")
-          expect(user_json).not_to include('password_digest')
-          expect(user_json).not_to include('email')
-        end
-      end
-    end
-
-    context 'with search query' do
-      [
-        { search: '', expect: { status: :ok, users_size: 10 } }, # lower boundary
-        { search: 's', expect: { status: :ok, users_size: 10 } }, # lower +1
-        { search: '      ', expect: { status: :ok, users_size: 10 } }, # edge case - string with whitespaces
-        { search: 'Jane Smith', expect: { status: :ok, users_size: 1 } }, # eq partition
-        { search: 'jane@example.com', expect: { status: :ok, users_size: 1 } }, # existing email
-        { search: 'NOTHING', expect: { status: :ok, users_size: 0 } }, # edge case
-        { search: 'a' * 119, expect: { status: :ok, users_size: 0 } }, # valid upper -1
-        { search: 'a' * 120, expect: { status: :ok, users_size: 0 } }, # valid upper boundary
-        { search: 'a' * 121, expect: { status: :bad_request, users_size: 0 } } # valid upper +1
-      ].each do |example|
-        it "returns #{example[:expect][:users_size]} users when searching with: #{example[:search]} and status: #{example[:expect][:status]}" do
+      context 'without search query' do
+        it 'returns all users paginated' do
           cookies[:jwt_auth] = token
-          get '/api/v1/users', params: { search: example[:search] }
-          expect(response).to have_http_status(example[:expect][:status])
-          json = JSON.parse(response.body)
+          get '/api/v1/users'
 
-          if example[:expect][:status] == :bad_request
-            (expect(json['error']).to eq('Search query too long (max 120 characters)'))
-          else
-            (expect(json['data'].size).to eq(example[:expect][:users_size]))
+          expect(response).to have_http_status(:ok)
+          json = JSON.parse(response.body)
+          expect(json['data'].size).to eq(10)
+          expect(json['pagination']).to include('current_page', 'total_pages', 'total_count')
+        end
+
+        it 'returns users in correct json #fullname and without password_digest' do
+          cookies[:jwt_auth] = token
+          get '/api/v1/users'
+
+          json = JSON.parse(response.body)
+          json['data'].each do |user_json|
+            expect(user_json['fullname']).to eq("#{user_json['first_name']} #{user_json['last_name']}")
+            expect(user_json).not_to include('password_digest')
+            expect(user_json).not_to include('email')
           end
         end
       end
-    end
 
-    context ' pagination ' do
-      [
-        # "invalid" page number LARGE NEGATIVE - 1
-        { pagination: { page: -100, per_page: 10 }, expect: { users_size: 10, status: :ok } }, # equivalence partition
-        { pagination: { page: 0, per_page: 10 }, expect: { users_size: 10, status: :ok } }, # -1 char from valid lower boundary
-        # "valid" page number 1 - LARGE NUMBER
-        { pagination: { page: 1, per_page: 10 }, expect: { users_size: 10, status: :ok } }, # valid lower
-        { pagination: { page: 2, per_page: 10 }, expect: { users_size: 10, status: :ok } },
-        { pagination: { page: 999999, per_page: 10 }, expect: { users_size: 0, status: :ok } }, # equivalence partition
+      context 'with search query' do
+        [
+          { search: '', expect: { status: :ok, users_size: 10 } }, # lower boundary
+          { search: 's', expect: { status: :ok, users_size: 10 } }, # lower +1
+          { search: '      ', expect: { status: :ok, users_size: 10 } }, # edge case - string with whitespaces
+          { search: 'Jane Smith', expect: { status: :ok, users_size: 1 } }, # eq partition
+          { search: 'jane@example.com', expect: { status: :ok, users_size: 1 } }, # existing email
+          { search: 'NOTHING', expect: { status: :ok, users_size: 0 } }, # edge case
+          { search: 'a' * 119, expect: { status: :ok, users_size: 0 } }, # valid upper -1
+          { search: 'a' * 120, expect: { status: :ok, users_size: 0 } }, # valid upper boundary
+          { search: 'a' * 121, expect: { status: :bad_request, users_size: 0 } } # valid upper +1
+        ].each do |example|
+          it "returns #{example[:expect][:users_size]} users when searching with: #{example[:search]} and status: #{example[:expect][:status]}" do
+            cookies[:jwt_auth] = token
+            get '/api/v1/users', params: { search: example[:search] }
+            expect(response).to have_http_status(example[:expect][:status])
+            json = JSON.parse(response.body)
 
-        # edge case testing if per_page is changed
-        { pagination: { page: 4, per_page: 2 }, expect: { users_size: 2, status: :ok } }
-      ].each do |example|
-        it "handles pagination with page number: #{example[:pagination][:page]} and returns #{example[:expect][:users_size]} users" do
-          cookies[:jwt_auth] = token
-          get '/api/v1/users', params: { page: example[:pagination][:page], per_page: example[:pagination][:per_page] }
-          expect(response).to have_http_status(example[:expect][:status])
-          json = JSON.parse(response.body)
+            if example[:expect][:status] == :bad_request
+              (expect(json['error']).to eq('Search query too long (max 120 characters)'))
+            else
+              (expect(json['data'].size).to eq(example[:expect][:users_size]))
+            end
+          end
+        end
+      end
 
-          example[:expect][:users_size] <= 0 ? (expect(json['data']).to be_empty) : (expect(json['data'].size).to eq(example[:expect][:users_size]))
-          expected_page_num = example[:pagination][:page] <= 0 ? 1 : example[:pagination][:page]
-          expect(json['pagination']['current_page']).to eq(expected_page_num)
+      context 'pagination' do
+        [
+          # "invalid" page number LARGE NEGATIVE - 1
+          { pagination: { page: -100, per_page: 10 }, expect: { users_size: 10, status: :ok } }, # equivalence partition
+          { pagination: { page: 0, per_page: 10 }, expect: { users_size: 10, status: :ok } }, # -1 char from valid lower boundary
+          # "valid" page number 1 - LARGE NUMBER
+          { pagination: { page: 1, per_page: 10 }, expect: { users_size: 10, status: :ok } }, # valid lower
+          { pagination: { page: 2, per_page: 10 }, expect: { users_size: 10, status: :ok } },
+          { pagination: { page: 999999, per_page: 10 }, expect: { users_size: 0, status: :ok } }, # equivalence partition
+
+          # edge case testing if per_page is changed
+          { pagination: { page: 4, per_page: 2 }, expect: { users_size: 2, status: :ok } }
+        ].each do |example|
+          it "handles pagination with page number: #{example[:pagination][:page]} and returns #{example[:expect][:users_size]} users" do
+            cookies[:jwt_auth] = token
+            get '/api/v1/users', params: { page: example[:pagination][:page], per_page: example[:pagination][:per_page] }
+            expect(response).to have_http_status(example[:expect][:status])
+            json = JSON.parse(response.body)
+
+            example[:expect][:users_size] <= 0 ? (expect(json['data']).to be_empty) : (expect(json['data'].size).to eq(example[:expect][:users_size]))
+            expected_page_num = example[:pagination][:page] <= 0 ? 1 : example[:pagination][:page]
+            expect(json['pagination']['current_page']).to eq(expected_page_num)
+          end
         end
       end
     end
@@ -107,7 +112,7 @@ RSpec.describe Api::V1::UsersController, type: :request do
   # ======================================
   # GET: SHOW
   # ======================================
-  context '#show' do
+  describe '#show' do
     context 'authentication' do
       it 'returns 401 if no token is provided (decision: unauthenticated)' do
         get '/api/v1/users/1212'
@@ -123,22 +128,22 @@ RSpec.describe Api::V1::UsersController, type: :request do
         expect(user_json).not_to include('password_digest')
         expect(user_json).not_to include('email')
       end
-    end
 
-    it 'returns the authenticated/signed-in user even if id-path-variable is incorrect' do
-      cookies[:jwt_auth] = token
-      get '/api/v1/users/1212'
-      user_json = JSON.parse(response.body)
-      expect(user_json['fullname']).to eq("Jane Smith")
-      expect(user_json).not_to include('password_digest')
-      expect(user_json).not_to include('email')
+      it 'returns the authenticated/signed-in user even if id-path-variable is incorrect' do
+        cookies[:jwt_auth] = token
+        get '/api/v1/users/1212'
+        user_json = JSON.parse(response.body)
+        expect(user_json['fullname']).to eq("Jane Smith")
+        expect(user_json).not_to include('password_digest')
+        expect(user_json).not_to include('email')
+      end
     end
   end
 
   # ======================================
   # POST: CREATE
   # ======================================
-  context '#create' do
+  describe '#create' do
     let(:valid_attributes) do
       {
         first_name: 'John',
@@ -203,7 +208,7 @@ RSpec.describe Api::V1::UsersController, type: :request do
   # ======================================
   # PUT/PATCH: UPDATE
   # ======================================
-  context '#update' do
+  describe '#update' do
     let(:sut_user) { create(:user, first_name: 'John', last_name: 'Doe', email: 'john@example.com') }
     let(:sut_token) do
       Auth::JsonWebToken.encode_user(sut_user)
@@ -230,7 +235,7 @@ RSpec.describe Api::V1::UsersController, type: :request do
       end
     end
 
-    context 'negative tests' do
+    describe 'negative tests' do
       it 'returns 422 when required fields are blank' do
         updated_attributes = { first_name: '', last_name: '' }
 
@@ -248,45 +253,45 @@ RSpec.describe Api::V1::UsersController, type: :request do
     end
   end
 
-  # ======================================
-  # DELETE: DESTROY
-  # ======================================
-  context '#destroy' do
-    context 'positive tests' do
-      it '' do
-      end
-    end
-    context 'negative tests' do
-      it '' do
-      end
-    end
-  end
-
-  # ======================================
-  # POST: UPLOAD_IMAGE
-  # ======================================
-  context '#update' do
-    context 'positive tests' do
-      it '' do
-      end
-    end
-    context 'negative tests' do
-      it '' do
-      end
-    end
-  end
-
-  # ======================================
-  # DELETE: DELETE_IMAGE
-  # ======================================
-  context '#destroy' do
-    context 'positive tests' do
-      it '' do
-      end
-    end
-    context 'negative tests' do
-      it '' do
-      end
-    end
-  end
+  # # ======================================
+  # # DELETE: DESTROY
+  # # ======================================
+  # context '#destroy' do
+  #   context 'positive tests' do
+  #     it '' do
+  #     end
+  #   end
+  #   context 'negative tests' do
+  #     it '' do
+  #     end
+  #   end
+  # end
+  #
+  # # ======================================
+  # # POST: UPLOAD_IMAGE
+  # # ======================================
+  # context '#update' do
+  #   context 'positive tests' do
+  #     it '' do
+  #     end
+  #   end
+  #   context 'negative tests' do
+  #     it '' do
+  #     end
+  #   end
+  # end
+  #
+  # # ======================================
+  # # DELETE: DELETE_IMAGE
+  # # ======================================
+  # context '#destroy' do
+  #   context 'positive tests' do
+  #     it '' do
+  #     end
+  #   end
+  #   context 'negative tests' do
+  #     it '' do
+  #     end
+  #   end
+  # end
 end
