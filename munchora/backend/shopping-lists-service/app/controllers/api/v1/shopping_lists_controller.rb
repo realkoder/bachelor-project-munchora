@@ -17,11 +17,15 @@ class Api::V1::ShoppingListsController < ApplicationController
   end
 
   def create
-    list = ShoppingLists::Creator.call(current_shopping_list_owner, shopping_list_params)
-    render json: list.as_json(include: [:items, shared_users: { only: [:id, :first_name, :last_name, :image_src] }]), status: :created
+    list = current_shopping_list_owner.shopping_lists.create(shopping_list_params)
+
+    if list.persisted?
+      render json: list.as_json(include: [:items, shared_users: { only: [:id, :first_name, :last_name, :image_src] }]), status: :created
+    else
+      render json: { errors: list.errors.full_messages }, status: :unprocessable_entity
+    end
   end
 
-  # PUT /api/v1/shopping_lists
   def update
     @shopping_list.update!(shopping_list_params)
     ShoppingLists::NotifyEvents.name_updated(@shopping_list)

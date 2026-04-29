@@ -154,7 +154,7 @@ RSpec.describe Api::V1::UsersController, type: :request do
       }
     end
 
-    it 'creates a new user with valid attributes and without sensitive data' do
+    it 'creates a new user with valid attributes and returns user without sensitive data' do
       expect { post '/api/v1/users', params: { user: valid_attributes }.to_json, headers: { 'Content-Type' => 'application/json' } }.to change(User, :count).by(1)
 
       expect(response).to have_http_status(:created)
