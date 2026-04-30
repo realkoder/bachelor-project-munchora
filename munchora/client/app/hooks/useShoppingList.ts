@@ -74,7 +74,7 @@ const useShoppingLists = () => {
   const shareList = async (listId: number, selectedUsers: IUser[]) => {
     try {
       const userIds = selectedUsers.map((user) => user.id);
-      await fetchShoppingList(`/shopping_lists/${listId}/share`, { method: 'POST', data: { user_ids: userIds } });
+      await fetchShoppingList(`/shopping-lists-app/api/v1/shopping_lists/${listId}/share`, { method: 'POST', data: { user_ids: userIds } });
       toast.info(`You succesfully shared your list with ${selectedUsers.length} other users.`);
     } catch {
       toast.error('Something went wrong sharing your list - try to reload');
@@ -83,7 +83,7 @@ const useShoppingLists = () => {
 
   const unShareList = async (listId: number, selectedUserId: number) => {
     try {
-      await fetchShoppingList(`/shopping_lists/${listId}/unshare`, {
+      await fetchShoppingList(`/shopping-lists-app/api/v1/shopping_lists/${listId}/unshare`, {
         method: 'DELETE',
         data: { user_id: selectedUserId },
       });

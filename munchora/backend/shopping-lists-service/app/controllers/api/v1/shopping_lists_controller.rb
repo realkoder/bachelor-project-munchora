@@ -27,9 +27,12 @@ class Api::V1::ShoppingListsController < ApplicationController
   end
 
   def update
-    @shopping_list.update!(shopping_list_params)
-    ShoppingLists::NotifyEvents.name_updated(@shopping_list)
-    render json: @shopping_list
+    if @shopping_list.update(shopping_list_params)
+      ShoppingLists::NotifyEvents.name_updated(@shopping_list)
+      render json: @shopping_list
+    else
+      render json: { errors: @shopping_list.errors.full_messages }, status: :unprocessable_entity
+    end
   end
 
   def destroy
@@ -46,16 +49,21 @@ class Api::V1::ShoppingListsController < ApplicationController
 
   def add_item
     item = ShoppingLists::ItemManager.add_item(@shopping_list, item_params, current_shopping_list_owner)
+
     ShoppingLists::NotifyEvents.item_added(@shopping_list, item)
     render json: item, status: :created
+  rescue ActiveRecord::RecordInvalid => e
+    render json: { errors: e.record.errors().full_messages }, status: :unprocessable_entity
   end
 
-  # DELETE /api/v1/shopping_lists/remove-item/:item_id
+  # DELETE /api/v1/shopping_lists/:id/remove-item/:item_id
   def remove_item
     item_id = params[:item_id]
     ShoppingLists::ItemManager.remove_item(@shopping_list, item_id)
     ShoppingLists::NotifyEvents.item_removed(@shopping_list, item_id)
     head :no_content
+  rescue
+    render status: :unprocessable_entity
   end
 
   def share
@@ -84,22 +92,22 @@ class Api::V1::ShoppingListsController < ApplicationController
     update_attrs[:name] = params[:name] if params[:name].present?
     update_attrs[:category] = params[:category] if params[:category].present?
 
-    item.update!(update_attrs)
-    ShoppingLists::NotifyEvents.item_updated(@shopping_list, item)
-    render json: item
+    if item.update(update_attrs)
+      ShoppingLists::NotifyEvents.item_updated(@shopping_list, item)
+      render json: item
+    else
+      render json: { errors: item.errors.full_messages }, status: :unprocessable_entity
+    end
   end
 
   private
 
   def set_shopping_list
-    @shopping_list = ShoppingList
-      .left_outer_joins(:shared_users)
-      .where(
-        'shopping_lists.owner_id = :owner_id OR shopping_list_owners.id = :owner_id',
-        owner_id: current_shopping_list_owner.id
-      )
-      .distinct
-      .find(params[:id])
+    @shopping_list = ShoppingList.find(params[:id])
+
+    unless @shopping_list.owner_id == current_shopping_list_owner.id || @shopping_list.shared_users.exists?(id: current_shopping_list_owner.id)
+      head :forbidden and return
+    end
   end
 
   def shopping_list_params
