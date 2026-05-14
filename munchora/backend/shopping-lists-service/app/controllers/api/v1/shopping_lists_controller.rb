@@ -103,7 +103,9 @@ class Api::V1::ShoppingListsController < ApplicationController
   private
 
   def set_shopping_list
-    @shopping_list = ShoppingList.find(params[:id])
+    @shopping_list = ShoppingList.find_by(id: params[:id])
+
+    return head :not_found unless @shopping_list
 
     unless @shopping_list.owner_id == current_shopping_list_owner.id || @shopping_list.shared_users.exists?(id: current_shopping_list_owner.id)
       head :forbidden and return
