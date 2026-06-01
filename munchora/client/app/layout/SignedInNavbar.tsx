@@ -40,18 +40,7 @@ export default function Navbar() {
           <span className={`${isActive('/shopping-lists') ? 'border-black border-b' : ''} ml-2`}>Shopping Lists</span>
         </Button>
       </NavLink>
-      <NavLink to="/faq" onClick={onClick}>
-        <Button variant="ghost" className="flex items-center w-full justify-start">
-          <MessageCircleQuestion />
-          <span className={`${isActive('/faq') ? 'border-black border-b' : ''} ml-2`}>FAQ</span>
-        </Button>
-      </NavLink>
-      <NavLink to="/about" onClick={onClick}>
-        <Button variant="ghost" className="flex items-center w-full justify-start">
-          <BookA />
-          <span className={`${isActive('/about') ? 'border-black border-b' : ''} ml-2`}>About</span>
-        </Button>
-      </NavLink>
+
       {curUser?.user?.id === ADMIN_USER_ID && (
         <NavLink to="/admin" onClick={onClick}>
           <Button variant="ghost" className="flex items-center w-full justify-start">
